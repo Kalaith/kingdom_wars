@@ -1,27 +1,22 @@
 import React, { useState } from 'react';
-import { useGameStore } from '../stores/gameStore';
-import { gameData } from '../data/gameData';
-import type { Resources } from '../types';
+import { useGameStore } from '../../stores/gameStore';
+import { gameData } from '../../data/gameData';
+import type { Resources, TrainingQueueItem } from '../../types';
+import { formatNumber } from '../../utils/constants';
 
 const MilitaryTab: React.FC = () => {
-  const currentTab = useGameStore(state => state.currentTab);
-  const army = useGameStore(state => state.army);
-  const buildings = useGameStore(state => state.buildings);
-  const trainingQueue = useGameStore(state => state.trainingQueue);
-  const trainUnit = useGameStore(state => state.trainUnit);
-  const canAfford = useGameStore(state => state.canAfford);
+  const currentTab = useGameStore((state) => state.currentTab);
+  const army = useGameStore((state) => state.army);
+  const buildings = useGameStore((state) => state.buildings);
+  const trainingQueue = useGameStore((state) => state.trainingQueue);
+  const trainUnit = useGameStore((state) => state.trainUnit);
+  const canAfford = useGameStore((state) => state.canAfford);
   
   const [selectedQuantities, setSelectedQuantities] = useState<Record<string, number>>({});
 
   if (currentTab !== 'military') {
     return null;
   }
-
-  const formatNumber = (num: number): string => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
-  };
 
   const formatCost = (cost: Partial<Resources>): string => {
     const parts: string[] = [];
@@ -48,7 +43,7 @@ const MilitaryTab: React.FC = () => {
     if (!unit) return false;
     
     const requiredBuilding = buildings[unit.building];
-    return requiredBuilding && requiredBuilding.level > 0;
+    return requiredBuilding !== undefined && requiredBuilding.level > 0;
   };
 
   const handleQuantityChange = (unitType: string, quantity: number) => {
@@ -220,7 +215,7 @@ const MilitaryTab: React.FC = () => {
             </h4>
             
             <div className="space-y-3">
-              {trainingQueue.map((item) => {
+              {trainingQueue.map((item: TrainingQueueItem) => {
                 const unit = gameData.units[item.unitType];
                 if (!unit) return null;
                 

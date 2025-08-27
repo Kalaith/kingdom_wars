@@ -1,123 +1,135 @@
 # Kingdom Wars - Text-Based Strategy Game
 
 ## Overview
-Kingdom Wars is a browser-based text strategy game. Players build kingdoms, manage resources, train armies, and engage in strategic warfare with other kingdoms. The game focuses on deep strategic gameplay with minimal graphics, making it accessible and engaging for all players.
+Kingdom Wars is a browser-based text strategy game built with React, TypeScript, and Vite. Players build kingdoms, manage resources, train armies, and engage in strategic warfare with other kingdoms.
 
----
+## Prerequisites
+- Node.js 18.x or higher
+- npm or yarn package manager
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd kingdom-wars/frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Run ESLint with auto-fix
+- `npm run format` - Format code with Prettier
+- `npm run type-check` - Run TypeScript type checking
+- `npm run test` - Run tests
+- `npm run test:run` - Run tests once
+- `npm run test:coverage` - Run tests with coverage
+
+## Project Structure
+
+```
+frontend/
+├── src/
+│   ├── api/              # API integration layer
+│   ├── components/
+│   │   ├── game/         # Game-specific components
+│   │   └── ui/           # Reusable UI components
+│   ├── data/             # Game data and configurations
+│   ├── hooks/            # Custom React hooks
+│   ├── stores/           # Zustand state management
+│   ├── types/            # TypeScript type definitions
+│   ├── utils/            # Utility functions and constants
+│   └── assets/           # Static assets
+├── public/               # Public assets
+└── dist/                 # Build output
+```
+
+## Tech Stack
+
+- **Frontend Framework**: React 19
+- **Language**: TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **State Management**: Zustand with persist middleware
+- **Animation**: Framer Motion
+- **Routing**: React Router DOM
+- **Testing**: Vitest + Testing Library
+- **Linting**: ESLint
+- **Formatting**: Prettier
 
 ## Features
 
 ### Kingdom Management
-- **Resource System**: Manage Gold, Food, Wood, and Stone to grow your kingdom.
-- **Building System**: Construct and upgrade buildings like Gold Mines, Farms, Barracks, and Walls.
-- **Population and Happiness**: Balance your kingdom's population and happiness for optimal growth.
+- Resource system (Gold, Food, Wood, Stone)
+- Building construction and upgrades
+- Population and happiness management
 
 ### Military Strategy
-- **Unit Types**: Train Soldiers, Spearmen, Archers, Crossbowmen, Knights, and Catapults.
-- **Combat System**: Engage in battles with other kingdoms using calculated attack and defense mechanics.
-- **Training Queue**: Manage unit training with real-time progress tracking.
+- Multiple unit types with different strengths
+- Combat system with attack/defense calculations
+- Training queue management
 
 ### Research and Technology
-- **Technologies**: Unlock powerful upgrades like Iron Working, Masonry, Agriculture, and Mining.
-- **Strategic Choices**: Decide between economic growth and military dominance.
+- Technology tree for strategic advancement
+- Research bonuses for economy and military
 
-### Multiplayer and Alliances
-- **Enemy Kingdoms**: Scout and attack other kingdoms for resources and glory.
-- **Alliance System**: Join alliances for mutual protection and coordinated attacks.
+### Multiplayer Elements
+- Enemy kingdoms to attack
+- Alliance system for cooperation
 
-### Accessibility
-- **Browser-Based**: No downloads required; works on modern browsers.
-- **Text-Based Interface**: Minimal graphics with clear navigation and intuitive controls.
+## Development
 
----
+### Code Quality
+- ESLint for code linting
+- Prettier for code formatting
+- TypeScript for type safety
+- Husky for git hooks (planned)
 
-## Game Mechanics
+### Testing
+- Unit tests with Vitest
+- Integration tests with Testing Library
+- Test coverage reporting
 
-### Resources
-- **Gold**: Primary currency for buildings and units.
-- **Food**: Required for training and maintaining armies.
-- **Wood**: Essential for construction and upgrades.
-- **Stone**: Needed for defensive structures.
+### State Management
+- Zustand for global state
+- Automatic persistence with localStorage
+- Selective state persistence
 
-### Buildings
-- **Town Hall**: Central hub that unlocks other structures.
-- **Gold Mine**: Generates gold over time.
-- **Farm**: Produces food for army maintenance.
-- **Barracks**: Trains infantry units.
-- **Walls**: Provides defense against enemy attacks.
+## Deployment
 
-### Units
-- **Soldier**: Balanced infantry unit.
-- **Spearman**: Anti-cavalry specialist.
-- **Archer**: High-damage ranged unit.
-- **Knight**: Elite cavalry unit.
-- **Catapult**: Siege weapon for destroying defenses.
+1. Build the project:
+```bash
+npm run build
+```
 
-### Technologies
-- **Iron Working**: Increases unit attack by 20%.
-- **Masonry**: Boosts building defense by 30%.
-- **Agriculture**: Enhances food production by 50%.
-- **Mining**: Improves gold and stone production by 40%.
+2. The build artifacts will be stored in the `dist/` directory.
 
----
+3. Serve the `dist` folder with any static hosting service.
 
-## Technical Details
+## Contributing
 
-### Architecture
-- **Frontend**: HTML5, CSS3, and JavaScript.
-- **Data Management**: Game state stored locally in memory.
-- **Responsive Design**: Optimized for desktop and mobile browsers.
-
-### Files
-- **`index.html`**: Main HTML structure for the game interface.
-- **`style.css`**: Styling for the game, including light and dark modes.
-- **`app.js`**: Core game logic, including resource management, building upgrades, and combat mechanics.
-- **`chart_script.py`**: Python script for generating unit stats comparison charts.
-- **`kingdom-wars-guide.md`**: Comprehensive strategy guide for players.
-
----
-
-## How to Play
-
-### Starting the Game
-1. Open `index.html` in a browser.
-2. Create your kingdom by entering a name and optionally uploading a flag.
-3. Begin managing resources, constructing buildings, and training your army.
-
-### Gameplay Tips
-- Focus on upgrading resource-generating buildings early.
-- Train a balanced army to defend your kingdom and raid others.
-- Research technologies to gain strategic advantages.
-- Join alliances for mutual protection and coordinated attacks.
-
----
-
-## Development Notes
-
-### Current State
-- Fully functional game with core mechanics implemented.
-- Responsive design for accessibility across devices.
-- Text-based interface with minimal graphics for simplicity.
-
-### Future Plans
-- Add more unit types and buildings.
-- Expand alliance features for deeper multiplayer interactions.
-- Implement seasonal events and challenges.
-- Optimize performance for larger kingdoms and armies.
-
----
-
-## Credits
-- **Developer**: WebHatchery Team
-- **Design Inspiration**: Clash of Clans and other strategy games
-- **Tools Used**: HTML, CSS, JavaScript, Python (for charts)
-
----
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
 
 ## License
-This project is open-source and available for personal and educational use. Commercial use requires permission from the WebHatchery Team.
 
----
-
-## Contact
-For questions, feedback, or contributions, please contact the WebHatchery Team at
+This project is open-source and available for personal and educational use.

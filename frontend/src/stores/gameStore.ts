@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { subscribeWithSelector } from 'zustand/middleware';
 import type { 
   GameState, 
@@ -78,7 +79,8 @@ const initialGameState: GameState = {
 };
 
 export const useGameStore = create<GameStore>()(
-  subscribeWithSelector((set, get) => ({
+  persist(
+    subscribeWithSelector((set, get) => ({
     ...initialGameState,
     currentTab: 'kingdom' as TabType,
     notifications: [],
@@ -96,9 +98,10 @@ export const useGameStore = create<GameStore>()(
     addResources: (resources: Partial<Resources>) => {
       set(state => {
         const newResources = { ...state.resources };
-        Object.entries(resources).forEach(([key, value]) => {
-          if (value && key in newResources) {
-            (newResources as any)[key] += value;
+        (Object.keys(resources) as Array<keyof Resources>).forEach(key => {
+          const value = resources[key];
+          if (value !== undefined) {
+            newResources[key] += value;
           }
         });
         return { resources: newResources };
@@ -111,9 +114,10 @@ export const useGameStore = create<GameStore>()(
 
       set(state => {
         const newResources = { ...state.resources };
-        Object.entries(resources).forEach(([key, value]) => {
-          if (value && key in newResources) {
-            (newResources as any)[key] -= value;
+        (Object.keys(resources) as Array<keyof Resources>).forEach(key => {
+          const value = resources[key];
+          if (value !== undefined) {
+            newResources[key] -= value;
           }
         });
         return { resources: newResources };
@@ -123,9 +127,9 @@ export const useGameStore = create<GameStore>()(
 
     canAfford: (cost: Partial<Resources>) => {
       const { resources } = get();
-      return Object.entries(cost).every(([key, value]) => {
-        if (!value) return true;
-        return (resources as any)[key] >= value;
+      return (Object.keys(cost) as Array<keyof Resources>).every(key => {
+        const value = cost[key];
+        return value === undefined || resources[key] >= value;
       });
     },
 
@@ -167,15 +171,20 @@ export const useGameStore = create<GameStore>()(
       if (!upgradeCost || !state.canAfford(upgradeCost)) return false;
       
       if (state.subtractResources(upgradeCost)) {
-        set(state => ({
-          buildings: {
-            ...state.buildings,
-            [buildingKey]: {
-              ...state.buildings[buildingKey],
-              level: state.buildings[buildingKey].level + 1
+        set(state => {
+          const currentBuilding = state.buildings[buildingKey];
+          if (!currentBuilding) return state;
+          
+          return {
+            buildings: {
+              ...state.buildings,
+              [buildingKey]: {
+                ...currentBuilding,
+                level: currentBuilding.level + 1
+              }
             }
-          }
-        }));
+          };
+        });
         
         get().addNotification({
           type: 'success',
@@ -413,47 +422,33 @@ export const useGameStore = create<GameStore>()(
     },
 
     saveGame: () => {
-      try {
-        const state = get();
-        const gameStateToSave = {
-          kingdom: state.kingdom,
-          resources: state.resources,
-          buildings: state.buildings,
-          army: state.army,
-          trainingQueue: state.trainingQueue,
-          research: state.research,
-          alliance: state.alliance,
-          lastUpdate: state.lastUpdate,
-          tutorialCompleted: state.tutorialCompleted,
-          actionCooldowns: state.actionCooldowns,
-          battleReports: state.battleReports,
-          isKingdomCreated: state.isKingdomCreated
-        };
-        localStorage.setItem('kingdomWarsGameState', JSON.stringify(gameStateToSave));
-      } catch (error) {
-        console.error('Failed to save game:', error);
-      }
+      // Zustand persist handles saving automatically
     },
 
     loadGame: () => {
-      try {
-        const savedState = localStorage.getItem('kingdomWarsGameState');
-        if (savedState) {
-          const parsedState = JSON.parse(savedState);
-          set(state => ({ ...state, ...parsedState }));
-        }
-      } catch (error) {
-        console.error('Failed to load game:', error);
-      }
+      // Zustand persist handles loading automatically
     }
-  }))
-);
+  })),
+  {
+    name: 'kingdomWarsGameState',
+    partialize: (state) => ({
+      kingdom: state.kingdom,
+      resources: state.resources,
+      buildings: state.buildings,
+      army: state.army,
+      trainingQueue: state.trainingQueue,
+      research: state.research,
+      alliance: state.alliance,
+      lastUpdate: state.lastUpdate,
+      tutorialCompleted: state.tutorialCompleted,
+      actionCooldowns: state.actionCooldowns,
+      battleReports: state.battleReports,
+      isKingdomCreated: state.isKingdomCreated
+    })
+  }
+));
 
-// Auto-save every 30 seconds
-setInterval(() => {
-  useGameStore.getState().saveGame();
-}, 30000);
-
+// Auto-save is handled by Zustand persist middleware
 // Update game time every second
 setInterval(() => {
   useGameStore.getState().updateGameTime();

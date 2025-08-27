@@ -1,24 +1,19 @@
 import React from 'react';
-import { useGameStore } from '../stores/gameStore';
-import { gameData } from '../data/gameData';
-import type { Resources } from '../types';
+import { useGameStore } from '../../stores/gameStore';
+import { gameData } from '../../data/gameData';
+import type { Resources, Technology } from '../../types';
+import { formatNumber } from '../../utils/constants';
 
 const ResearchTab: React.FC = () => {
-  const currentTab = useGameStore(state => state.currentTab);
-  const research = useGameStore(state => state.research);
-  const startResearch = useGameStore(state => state.startResearch);
-  const canResearch = useGameStore(state => state.canResearch);
-  const canAfford = useGameStore(state => state.canAfford);
+  const currentTab = useGameStore((state: any) => state.currentTab);
+  const research = useGameStore((state: any) => state.research);
+  const startResearch = useGameStore((state: any) => state.startResearch);
+  const canResearch = useGameStore((state: any) => state.canResearch);
+  const canAfford = useGameStore((state: any) => state.canAfford);
 
   if (currentTab !== 'research') {
     return null;
   }
-
-  const formatNumber = (num: number): string => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
-  };
 
   const formatCost = (cost: Partial<Resources>): string => {
     const parts: string[] = [];
@@ -56,9 +51,9 @@ const ResearchTab: React.FC = () => {
   const techsByCategory = Object.entries(gameData.technologies).reduce((acc, [key, tech]) => {
     const category = getTechCategory(key);
     if (!acc[category]) acc[category] = [];
-    acc[category].push({ key, tech });
+    acc[category].push({ key, tech: tech as Technology });
     return acc;
-  }, {} as Record<string, Array<{ key: string; tech: any }>>);
+  }, {} as Record<string, Array<{ key: string; tech: Technology }>>);
 
   return (
     <div className="bg-gray-50 p-6 min-h-screen">
@@ -92,7 +87,7 @@ const ResearchTab: React.FC = () => {
               Completed Research
             </h4>
             <div className="flex flex-wrap gap-2">
-              {research.completed.map(techKey => {
+              {research.completed.map((techKey: string) => {
                 const tech = gameData.technologies[techKey];
                 if (!tech) return null;
                 

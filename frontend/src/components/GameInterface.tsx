@@ -1,10 +1,10 @@
 import React from 'react';
-import KingdomTab from './KingdomTab';
-import BuildingsTab from './BuildingsTab';
-import MilitaryTab from './MilitaryTab';
-import AttackTab from './AttackTab';
-import ResearchTab from './ResearchTab';
-import AlliancesTab from './AlliancesTab';
+import KingdomTab from './game/KingdomTab';
+import BuildingsTab from './game/BuildingsTab';
+import MilitaryTab from './game/MilitaryTab';
+import AttackTab from './game/AttackTab';
+import ResearchTab from './game/ResearchTab';
+import AlliancesTab from './game/AlliancesTab';
 import { useGameStore } from '../stores/gameStore';
 
 const GameInterface: React.FC = () => {

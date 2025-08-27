@@ -1,5 +1,6 @@
 import React from 'react';
-import { useGameStore } from '../stores/gameStore';
+import { useGameStore } from '../../stores/gameStore';
+import { formatNumber } from '../../utils/constants';
 
 const AlliancesTab: React.FC = () => {
   const currentTab = useGameStore(state => state.currentTab);
@@ -68,12 +69,6 @@ const AlliancesTab: React.FC = () => {
       message: 'You have left your alliance. You can join a new one anytime.',
       duration: 5000
     });
-  };
-
-  const formatNumber = (num: number): string => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
   };
 
   const getAllianceIcon = (allianceId: string): string => {

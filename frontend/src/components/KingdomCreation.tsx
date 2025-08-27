@@ -74,7 +74,10 @@ const KingdomCreation: React.FC = () => {
               value={kingdomName}
               onChange={(e) => {
                 setKingdomName(e.target.value);
-                if (errors.name) setErrors({ ...errors, name: undefined });
+                if (errors.name) {
+                  const { name, ...restErrors } = errors;
+                  setErrors(restErrors);
+                }
               }}
               onKeyPress={handleKeyPress}
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${

@@ -1,24 +1,19 @@
 import React from 'react';
-import { useGameStore } from '../stores/gameStore';
-import type { Resources } from '../types';
+import { useGameStore } from '../../stores/gameStore';
+import type { Resources, Building } from '../../types';
+import { formatNumber } from '../../utils/constants';
 
 const BuildingsTab: React.FC = () => {
-  const currentTab = useGameStore(state => state.currentTab);
-  const buildings = useGameStore(state => state.buildings);
-  const upgradeBuilding = useGameStore(state => state.upgradeBuilding);
-  const canUpgradeBuilding = useGameStore(state => state.canUpgradeBuilding);
-  const getBuildingUpgradeCost = useGameStore(state => state.getBuildingUpgradeCost);
-  const canAfford = useGameStore(state => state.canAfford);
+  const currentTab = useGameStore((state: any) => state.currentTab);
+  const buildings = useGameStore((state: any) => state.buildings);
+  const upgradeBuilding = useGameStore((state: any) => state.upgradeBuilding);
+  const canUpgradeBuilding = useGameStore((state: any) => state.canUpgradeBuilding);
+  const getBuildingUpgradeCost = useGameStore((state: any) => state.getBuildingUpgradeCost);
+  const canAfford = useGameStore((state: any) => state.canAfford);
 
   if (currentTab !== 'buildings') {
     return null;
   }
-
-  const formatNumber = (num: number): string => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
-  };
 
   const formatCost = (cost: Partial<Resources>): string => {
     const parts: string[] = [];
@@ -68,9 +63,9 @@ const BuildingsTab: React.FC = () => {
   const buildingsByCategory = Object.entries(buildings).reduce((acc, [key, building]) => {
     const category = getBuildingCategory(key);
     if (!acc[category]) acc[category] = [];
-    acc[category].push({ key, building });
+    acc[category].push({ key, building: building as Building });
     return acc;
-  }, {} as Record<string, Array<{ key: string; building: any }>>);
+  }, {} as Record<string, Array<{ key: string; building: Building }>>);
 
   return (
     <div className="bg-gray-50 p-6 min-h-screen">

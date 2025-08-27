@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { useGameStore } from '../stores/gameStore';
-import { gameData } from '../data/gameData';
-import type { EnemyKingdom } from '../types';
+import { useGameStore } from '../../stores/gameStore';
+import { gameData } from '../../data/gameData';
+import type { EnemyKingdom, Resources } from '../../types';
+import { formatNumber } from '../../utils/constants';
 
 const AttackTab: React.FC = () => {
-  const currentTab = useGameStore(state => state.currentTab);
-  const army = useGameStore(state => state.army);
-  const getArmyPower = useGameStore(state => state.getArmyPower);
-  const addResources = useGameStore(state => state.addResources);
-  const addNotification = useGameStore(state => state.addNotification);
+  const currentTab = useGameStore((state) => state.currentTab);
+  const army = useGameStore((state) => state.army);
+  const getArmyPower = useGameStore((state) => state.getArmyPower);
+  const addResources = useGameStore((state) => state.addResources);
+  const addNotification = useGameStore((state) => state.addNotification);
   
   const [selectedTarget, setSelectedTarget] = useState<EnemyKingdom | null>(null);
   const [attackInProgress, setAttackInProgress] = useState(false);
@@ -18,13 +19,8 @@ const AttackTab: React.FC = () => {
   }
 
   const armyPower = getArmyPower();
-  const hasArmy = Object.values(army).some(count => count > 0);
-
-  const formatNumber = (num: number): string => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
-  };
+  const armyValues = Object.values(army).filter((count): count is number => count !== undefined);
+  const hasArmy = armyValues.some(count => count > 0);
 
   const getRecommendation = (enemyPower: number): { text: string; color: string } => {
     const powerRatio = armyPower / enemyPower;
@@ -36,7 +32,7 @@ const AttackTab: React.FC = () => {
     return { text: 'Very Risky', color: 'text-red-600' };
   };
 
-  const simulateBattle = (enemy: EnemyKingdom): { victory: boolean; resourcesGained: any; losses: number } => {
+  const simulateBattle = (enemy: EnemyKingdom): { victory: boolean; resourcesGained: Resources; losses: number } => {
     const powerRatio = armyPower / enemy.power;
     const randomFactor = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
     const adjustedRatio = powerRatio * randomFactor;
@@ -128,7 +124,7 @@ const AttackTab: React.FC = () => {
                 <div className="text-2xl mb-2">👥</div>
                 <div className="font-semibold text-slate-700">Total Units</div>
                 <div className="text-xl font-bold text-blue-600">
-                  {formatNumber(Object.values(army).reduce((sum, count) => sum + count, 0))}
+                  {formatNumber(armyValues.reduce((sum, count) => sum + count, 0))}
                 </div>
               </div>
               
@@ -150,7 +146,7 @@ const AttackTab: React.FC = () => {
             </h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {gameData.enemyKingdoms.map((enemy, index) => {
+              {gameData.enemyKingdoms.map((enemy: EnemyKingdom, index: number) => {
                 const recommendation = getRecommendation(enemy.power);
                 const isBeingAttacked = selectedTarget?.name === enemy.name && attackInProgress;
                 

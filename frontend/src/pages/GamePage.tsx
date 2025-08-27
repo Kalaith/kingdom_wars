@@ -6,7 +6,7 @@ import Notifications from '../components/Notifications';
 import { useGameStore } from '../stores/gameStore';
 
 export const GamePage: React.FC = () => {
-  const loadGame = useGameStore(state => state.loadGame);
+  const loadGame = useGameStore((state) => state.loadGame);
 
   useEffect(() => {
     // Load saved game state on app start
