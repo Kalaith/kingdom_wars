@@ -1,9 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Read(h:\\WebHatchery\\game_apps\\kingdom_wars/**)"
+      "Read(h:\\WebHatchery\\game_apps\\kingdom_wars/**)",
+      "Bash(npm run ci:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "H:\\mnt\\h\\WebHatchery\\game_apps\\kingdom_wars"
+    ]
   }
 }
