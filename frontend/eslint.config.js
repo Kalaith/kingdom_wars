@@ -27,42 +27,56 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
-      // Custom naming conventions - relaxed for React components
+      // Naming conventions per WebHatchery standards
       '@typescript-eslint/naming-convention': [
         'error',
+        // Variables and functions: camelCase
         {
           selector: 'variableLike',
           format: ['camelCase'],
+          // Allow React components to be PascalCase
           filter: {
-            regex: '^(?!.*Component|Tab|Page|Header|Interface|Creation|Navigation|Notifications|Bar|Boundary|Constants|App|GameHeader|GameInterface|KingdomCreation|ResourceBar|AlliancesTab|AttackTab|BuildingsTab|KingdomTab|MilitaryTab|ResearchTab|GamePage).*$',
-            match: true,
+            regex: '^[A-Z].*Component$|^[A-Z][a-z].*$',
+            match: false,
           },
         },
         {
           selector: 'function',
-          format: ['camelCase', 'PascalCase'],
+          format: ['camelCase'],
+          // Allow React functional components to be PascalCase
+          filter: {
+            regex: '^[A-Z]',
+            match: false,
+          },
         },
+        // React Components: PascalCase
+        {
+          selector: 'variable',
+          format: ['PascalCase'],
+          filter: {
+            regex: '^[A-Z].*',
+            match: true,
+          },
+        },
+        // Types, interfaces, classes: PascalCase
         {
           selector: 'typeLike',
           format: ['PascalCase'],
         },
         {
-          selector: 'variable',
-          types: ['boolean'],
+          selector: 'class',
           format: ['PascalCase'],
-          prefix: ['is', 'should', 'has', 'can', 'did', 'will'],
-          filter: {
-            regex: '^(?!attackInProgress|victory).*$',
-            match: true,
-          },
         },
+        // Constants: UPPER_SNAKE_CASE or PascalCase for React components
         {
           selector: 'variable',
+          modifiers: ['const'],
+          format: ['camelCase', 'PascalCase', 'UPPER_SNAKE_CASE'],
+        },
+        // Enum values: PascalCase
+        {
+          selector: 'enumMember',
           format: ['PascalCase'],
-          filter: {
-            regex: '^.*Constants$',
-            match: true,
-          },
         },
       ],
       // Allow explicit any in some cases but warn

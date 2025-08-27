@@ -5,11 +5,11 @@ import type { Resources, Technology } from '../../types';
 import { formatNumber } from '../../utils/constants';
 
 const ResearchTab: React.FC = () => {
-  const currentTab = useGameStore((state: any) => state.currentTab);
-  const research = useGameStore((state: any) => state.research);
-  const startResearch = useGameStore((state: any) => state.startResearch);
-  const canResearch = useGameStore((state: any) => state.canResearch);
-  const canAfford = useGameStore((state: any) => state.canAfford);
+  const currentTab = useGameStore((state) => state.currentTab);
+  const research = useGameStore((state) => state.research);
+  const startResearch = useGameStore((state) => state.startResearch);
+  const canResearch = useGameStore((state) => state.canResearch);
+  const canAfford = useGameStore((state) => state.canAfford);
 
   if (currentTab !== 'research') {
     return null;

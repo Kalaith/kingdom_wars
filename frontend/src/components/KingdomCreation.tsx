@@ -75,7 +75,8 @@ const KingdomCreation: React.FC = () => {
               onChange={(e) => {
                 setKingdomName(e.target.value);
                 if (errors.name) {
-                  const { name, ...restErrors } = errors;
+                  const restErrors = { ...errors };
+                  delete restErrors.name;
                   setErrors(restErrors);
                 }
               }}

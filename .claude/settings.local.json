@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(h:\\WebHatchery\\game_apps\\kingdom_wars/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

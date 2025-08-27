@@ -4,12 +4,12 @@ import type { Resources, Building } from '../../types';
 import { formatNumber } from '../../utils/constants';
 
 const BuildingsTab: React.FC = () => {
-  const currentTab = useGameStore((state: any) => state.currentTab);
-  const buildings = useGameStore((state: any) => state.buildings);
-  const upgradeBuilding = useGameStore((state: any) => state.upgradeBuilding);
-  const canUpgradeBuilding = useGameStore((state: any) => state.canUpgradeBuilding);
-  const getBuildingUpgradeCost = useGameStore((state: any) => state.getBuildingUpgradeCost);
-  const canAfford = useGameStore((state: any) => state.canAfford);
+  const currentTab = useGameStore((state) => state.currentTab);
+  const buildings = useGameStore((state) => state.buildings);
+  const upgradeBuilding = useGameStore((state) => state.upgradeBuilding);
+  const canUpgradeBuilding = useGameStore((state) => state.canUpgradeBuilding);
+  const getBuildingUpgradeCost = useGameStore((state) => state.getBuildingUpgradeCost);
+  const canAfford = useGameStore((state) => state.canAfford);
 
   if (currentTab !== 'buildings') {
     return null;
