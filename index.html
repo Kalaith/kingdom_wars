@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdom Wars - Text-Based Strategy Game</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/layout.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/themes.css">
+    <link rel="stylesheet" href="styles/game-specific.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Game Header -->
+        <header class="game-header">
+            <h1>Kingdom Wars</h1>
+            <div class="resource-bar" id="resourceBar" style="display: none;">
+                <div class="resource-item">
+                    <span class="resource-icon">🏛️</span>
+                    <span id="goldAmount">0</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-icon">🌾</span>
+                    <span id="foodAmount">0</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-icon">🪵</span>
+                    <span id="woodAmount">0</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-icon">🪨</span>
+                    <span id="stoneAmount">0</span>
+                </div>
+                <div class="kingdom-info">
+                    <span id="kingdomName">Kingdom</span> | Power: <span id="kingdomPower">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Kingdom Creation Screen -->
+        <div id="kingdomCreation" class="screen active">
+            <div class="card">
+                <div class="card__body">
+                    <h2>Create Your Kingdom</h2>
+                    <div class="form-group">
+                        <label class="form-label" for="kingdomNameInput">Kingdom Name</label>
+                        <input type="text" id="kingdomNameInput" class="form-control" placeholder="Enter your kingdom name" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="flagUpload">Kingdom Flag (Optional)</label>
+                        <input type="file" id="flagUpload" class="form-control" accept="image/*">
+                        <div id="flagPreview" class="flag-preview"></div>
+                    </div>
+                    <button id="createKingdomBtn" class="btn btn--primary btn--full-width">Create Kingdom</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Game Interface -->
+        <div id="gameInterface" class="screen">
+            <!-- Navigation Tabs -->
+            <nav class="game-nav">
+                <button class="nav-tab active" data-tab="kingdom">Kingdom</button>
+                <button class="nav-tab" data-tab="buildings">Buildings</button>
+                <button class="nav-tab" data-tab="military">Military</button>
+                <button class="nav-tab" data-tab="attack">Attack</button>
+                <button class="nav-tab" data-tab="research">Research</button>
+                <button class="nav-tab" data-tab="alliances">Alliances</button>
+            </nav>
+
+            <!-- Kingdom Tab -->
+            <div id="kingdom" class="tab-content active">
+                <div class="kingdom-overview">
+                    <div class="kingdom-flag">
+                        <img id="kingdomFlagImg" src="" alt="Kingdom Flag" style="display: none;">
+                        <div id="defaultFlag" class="default-flag">🏰</div>
+                    </div>
+                    <div class="kingdom-stats">
+                        <h3 id="kingdomTitle">Kingdom</h3>
+                        <div class="stat-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Population:</span>
+                                <span id="population">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Happiness:</span>
+                                <span id="happiness">100%</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Defense:</span>
+                                <span id="totalDefense">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Army Size:</span>
+                                <span id="armySize">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="production-overview">
+                    <h4>Resource Production</h4>
+                    <div class="production-grid">
+                        <div class="production-item">
+                            <span>🏛️ Gold: +<span id="goldProduction">0</span>/min</span>
+                        </div>
+                        <div class="production-item">
+                            <span>🌾 Food: +<span id="foodProduction">0</span>/min</span>
+                        </div>
+                        <div class="production-item">
+                            <span>🪵 Wood: +<span id="woodProduction">0</span>/min</span>
+                        </div>
+                        <div class="production-item">
+                            <span>🪨 Stone: +<span id="stoneProduction">0</span>/min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buildings Tab -->
+            <div id="buildings" class="tab-content">
+                <h3>Buildings</h3>
+                <div id="buildingsList" class="buildings-grid"></div>
+            </div>
+
+            <!-- Military Tab -->
+            <div id="military" class="tab-content">
+                <h3>Military Forces</h3>
+                <div class="military-section">
+                    <h4>Train Units</h4>
+                    <div id="unitTraining" class="unit-training-grid"></div>
+                </div>
+                <div class="military-section">
+                    <h4>Your Army</h4>
+                    <div id="armyList" class="army-list"></div>
+                </div>
+                <div class="military-section">
+                    <h4>Training Queue</h4>
+                    <div id="trainingQueue" class="training-queue"></div>
+                </div>
+            </div>
+
+            <!-- Attack Tab -->
+            <div id="attack" class="tab-content">
+                <h3>Attack Other Kingdoms</h3>
+                <div id="enemyKingdoms" class="enemy-kingdoms"></div>
+            </div>
+
+            <!-- Research Tab -->
+            <div id="research" class="tab-content">
+                <h3>Technology Research</h3>
+                <div id="researchList" class="research-grid"></div>
+            </div>
+
+            <!-- Alliances Tab -->
+            <div id="alliances" class="tab-content">
+                <h3>Alliances</h3>
+                <div class="alliance-section">
+                    <h4>Your Alliance</h4>
+                    <div id="currentAlliance" class="current-alliance">
+                        <p>You are not in an alliance.</p>
+                    </div>
+                </div>
+                <div class="alliance-section">
+                    <h4>Available Alliances</h4>
+                    <div id="availableAlliances" class="available-alliances"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Battle Modal -->
+        <div id="battleModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Battle Report</h3>
+                    <button class="modal-close" onclick="closeBattleModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="battleReport"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification System -->
+        <div id="notifications" class="notifications"></div>
+    </div>
+
+    <script src="scripts/gameData.js"></script>
+    <script src="scripts/gameState.js"></script>
+    <script src="scripts/tutorial.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/gameLogic.js"></script>
+    <script src="scripts/events.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
