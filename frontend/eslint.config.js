@@ -33,30 +33,11 @@ export default tseslint.config(
         // Variables and functions: camelCase
         {
           selector: 'variableLike',
-          format: ['camelCase'],
-          // Allow React components to be PascalCase
-          filter: {
-            regex: '^[A-Z].*Component$|^[A-Z][a-z].*$',
-            match: false,
-          },
+          format: ['camelCase', 'PascalCase'], // Allow PascalCase for React components
         },
         {
           selector: 'function',
-          format: ['camelCase'],
-          // Allow React functional components to be PascalCase
-          filter: {
-            regex: '^[A-Z]',
-            match: false,
-          },
-        },
-        // React Components: PascalCase
-        {
-          selector: 'variable',
-          format: ['PascalCase'],
-          filter: {
-            regex: '^[A-Z].*',
-            match: true,
-          },
+          format: ['camelCase', 'PascalCase'], // Allow PascalCase for React components
         },
         // Types, interfaces, classes: PascalCase
         {
@@ -66,12 +47,6 @@ export default tseslint.config(
         {
           selector: 'class',
           format: ['PascalCase'],
-        },
-        // Constants: UPPER_SNAKE_CASE or PascalCase for React components
-        {
-          selector: 'variable',
-          modifiers: ['const'],
-          format: ['camelCase', 'PascalCase', 'UPPER_SNAKE_CASE'],
         },
         // Enum values: PascalCase
         {
