@@ -11,8 +11,10 @@ const MilitaryTab: React.FC = () => {
   const trainingQueue = useGameStore((state) => state.trainingQueue);
   const trainUnit = useGameStore((state) => state.trainUnit);
   const canAfford = useGameStore((state) => state.canAfford);
-  
-  const [selectedQuantities, setSelectedQuantities] = useState<Record<string, number>>({});
+
+  const [selectedQuantities, setSelectedQuantities] = useState<
+    Record<string, number>
+  >({});
 
   if (currentTab !== 'military') {
     return null;
@@ -33,7 +35,7 @@ const MilitaryTab: React.FC = () => {
       spearman: '🛡️',
       archer: '🏹',
       crossbowman: '🎯',
-      knight: '🐎'
+      knight: '🐎',
     };
     return icons[unitType] || '⚔️';
   };
@@ -41,37 +43,40 @@ const MilitaryTab: React.FC = () => {
   const canTrainUnit = (unitType: string): boolean => {
     const unit = gameData.units[unitType];
     if (!unit) return false;
-    
+
     const requiredBuilding = buildings[unit.building];
     return requiredBuilding !== undefined && requiredBuilding.level > 0;
   };
 
   const handleQuantityChange = (unitType: string, quantity: number) => {
-    setSelectedQuantities(prev => ({
+    setSelectedQuantities((prev) => ({
       ...prev,
-      [unitType]: Math.max(1, quantity)
+      [unitType]: Math.max(1, quantity),
     }));
   };
 
   const handleTrainUnit = (unitType: string) => {
     const quantity = selectedQuantities[unitType] || 1;
     if (trainUnit(unitType, quantity)) {
-      setSelectedQuantities(prev => ({
+      setSelectedQuantities((prev) => ({
         ...prev,
-        [unitType]: 1
+        [unitType]: 1,
       }));
     }
   };
 
-  const getTotalCost = (unitType: string, quantity: number): Partial<Resources> => {
+  const getTotalCost = (
+    unitType: string,
+    quantity: number
+  ): Partial<Resources> => {
     const unit = gameData.units[unitType];
     if (!unit) return {};
-    
+
     return {
       gold: (unit.cost.gold || 0) * quantity,
       food: (unit.cost.food || 0) * quantity,
       wood: (unit.cost.wood || 0) * quantity,
-      stone: (unit.cost.stone || 0) * quantity
+      stone: (unit.cost.stone || 0) * quantity,
     };
   };
 
@@ -85,8 +90,10 @@ const MilitaryTab: React.FC = () => {
   return (
     <div className="bg-gray-50 p-6 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">Military Forces</h3>
-        
+        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">
+          Military Forces
+        </h3>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Train Units */}
           <div className="card p-6">
@@ -94,14 +101,14 @@ const MilitaryTab: React.FC = () => {
               <span className="mr-2">🏋️</span>
               Train Units
             </h4>
-            
+
             <div className="space-y-4">
               {Object.entries(gameData.units).map(([unitType, unit]) => {
                 const canTrain = canTrainUnit(unitType);
                 const quantity = selectedQuantities[unitType] || 1;
                 const totalCost = getTotalCost(unitType, quantity);
                 const canAffordTraining = canAfford(totalCost);
-                
+
                 return (
                   <div
                     key={unitType}
@@ -113,9 +120,12 @@ const MilitaryTab: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <span className="text-xl">{getUnitIcon(unitType)}</span>
                         <div>
-                          <h5 className="font-semibold text-slate-800">{unit.name}</h5>
+                          <h5 className="font-semibold text-slate-800">
+                            {unit.name}
+                          </h5>
                           <div className="text-xs text-slate-500">
-                            ATK: {unit.attack} | DEF: {unit.defense} | HP: {unit.health}
+                            ATK: {unit.attack} | DEF: {unit.defense} | HP:{' '}
+                            {unit.health}
                           </div>
                         </div>
                       </div>
@@ -125,13 +135,13 @@ const MilitaryTab: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     {!canTrain && (
                       <div className="text-red-600 text-sm mb-2">
                         Requires: {gameData.buildings[unit.building]?.name}
                       </div>
                     )}
-                    
+
                     {canTrain && (
                       <div className="flex items-center space-x-2">
                         <input
@@ -139,7 +149,12 @@ const MilitaryTab: React.FC = () => {
                           min="1"
                           max="100"
                           value={quantity}
-                          onChange={(e) => handleQuantityChange(unitType, parseInt(e.target.value) || 1)}
+                          onChange={(e) =>
+                            handleQuantityChange(
+                              unitType,
+                              parseInt(e.target.value) || 1
+                            )
+                          }
                           className="w-16 px-2 py-1 border border-slate-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <div className="flex-1 text-xs text-slate-600">
@@ -170,7 +185,7 @@ const MilitaryTab: React.FC = () => {
               <span className="mr-2">⚔️</span>
               Your Army
             </h4>
-            
+
             {Object.keys(army).length === 0 ? (
               <div className="text-center py-8 text-slate-500">
                 <div className="text-4xl mb-2">🏴</div>
@@ -182,20 +197,28 @@ const MilitaryTab: React.FC = () => {
                 {Object.entries(army).map(([unitType, count]) => {
                   const unit = gameData.units[unitType];
                   if (!unit || count === 0) return null;
-                  
+
                   return (
-                    <div key={unitType} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-slate-100 transition-colors">
+                    <div
+                      key={unitType}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-slate-100 transition-colors"
+                    >
                       <div className="flex items-center space-x-3">
                         <span className="text-xl">{getUnitIcon(unitType)}</span>
                         <div>
-                          <div className="font-semibold text-slate-800">{unit.name}</div>
+                          <div className="font-semibold text-slate-800">
+                            {unit.name}
+                          </div>
                           <div className="text-xs text-slate-500">
-                            ATK: {unit.attack} | DEF: {unit.defense} | HP: {unit.health}
+                            ATK: {unit.attack} | DEF: {unit.defense} | HP:{' '}
+                            {unit.health}
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-lg font-bold text-slate-800">{formatNumber(count)}</div>
+                        <div className="text-lg font-bold text-slate-800">
+                          {formatNumber(count)}
+                        </div>
                         <div className="text-xs text-slate-500">units</div>
                       </div>
                     </div>
@@ -213,16 +236,21 @@ const MilitaryTab: React.FC = () => {
               <span className="mr-2">⏱️</span>
               Training Queue
             </h4>
-            
+
             <div className="space-y-3">
               {trainingQueue.map((item: TrainingQueueItem) => {
                 const unit = gameData.units[item.unitType];
                 if (!unit) return null;
-                
+
                 return (
-                  <div key={item.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
+                  >
                     <div className="flex items-center space-x-3">
-                      <span className="text-xl">{getUnitIcon(item.unitType)}</span>
+                      <span className="text-xl">
+                        {getUnitIcon(item.unitType)}
+                      </span>
                       <div>
                         <div className="font-semibold text-slate-800">
                           {item.quantity}x {unit.name}
@@ -252,10 +280,17 @@ const MilitaryTab: React.FC = () => {
             Military Tips
           </h5>
           <ul className="text-sm text-red-700 space-y-1">
-            <li>• Train a diverse army with different unit types for maximum effectiveness</li>
-            <li>• Higher-tier units are more powerful but cost more resources</li>
+            <li>
+              • Train a diverse army with different unit types for maximum
+              effectiveness
+            </li>
+            <li>
+              • Higher-tier units are more powerful but cost more resources
+            </li>
             <li>• Build military buildings to unlock new unit types</li>
-            <li>• Keep training units to grow your army and increase your power</li>
+            <li>
+              • Keep training units to grow your army and increase your power
+            </li>
           </ul>
         </div>
       </div>

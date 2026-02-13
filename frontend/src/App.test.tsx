@@ -7,7 +7,7 @@ describe('App', () => {
     render(<App />);
     expect(screen.getByText('Kingdom Wars')).toBeDefined();
   });
-  
+
   it('renders the kingdom creation form', () => {
     render(<App />);
     expect(screen.getByText('Create Your Kingdom')).toBeDefined();

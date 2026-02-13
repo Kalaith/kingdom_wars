@@ -29,7 +29,7 @@ const ResearchTab: React.FC = () => {
       ironWorking: '⚒️',
       masonry: '🧱',
       agriculture: '🌱',
-      mining: '⛏️'
+      mining: '⛏️',
     };
     return icons[techKey] || '🔬';
   };
@@ -48,32 +48,42 @@ const ResearchTab: React.FC = () => {
   };
 
   // Group technologies by category
-  const techsByCategory = Object.entries(gameData.technologies).reduce((acc, [key, tech]) => {
-    const category = getTechCategory(key);
-    if (!acc[category]) acc[category] = [];
-    acc[category].push({ key, tech: tech as Technology });
-    return acc;
-  }, {} as Record<string, Array<{ key: string; tech: Technology }>>);
+  const techsByCategory = Object.entries(gameData.technologies).reduce(
+    (acc, [key, tech]) => {
+      const category = getTechCategory(key);
+      if (!acc[category]) acc[category] = [];
+      acc[category].push({ key, tech: tech as Technology });
+      return acc;
+    },
+    {} as Record<string, Array<{ key: string; tech: Technology }>>
+  );
 
   return (
     <div className="bg-gray-50 p-6 min-h-screen">
       <div className="max-w-6xl mx-auto">
-        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">Technology Research</h3>
-        
+        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">
+          Technology Research
+        </h3>
+
         {/* Research Status */}
         {research.inProgress && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <div className="flex items-center space-x-3">
               <span className="text-2xl">🔬</span>
               <div>
-                <h4 className="font-semibold text-blue-800">Research in Progress</h4>
+                <h4 className="font-semibold text-blue-800">
+                  Research in Progress
+                </h4>
                 <p className="text-blue-600">
-                  Currently researching: {gameData.technologies[research.inProgress]?.name}
+                  Currently researching:{' '}
+                  {gameData.technologies[research.inProgress]?.name}
                 </p>
                 <div className="w-full bg-blue-200 rounded-full h-2 mt-2">
                   <div className="bg-blue-600 h-2 rounded-full w-1/3 animate-pulse"></div>
                 </div>
-                <p className="text-sm text-blue-500 mt-1">Research will complete automatically</p>
+                <p className="text-sm text-blue-500 mt-1">
+                  Research will complete automatically
+                </p>
               </div>
             </div>
           </div>
@@ -90,9 +100,12 @@ const ResearchTab: React.FC = () => {
               {research.completed.map((techKey: string) => {
                 const tech = gameData.technologies[techKey];
                 if (!tech) return null;
-                
+
                 return (
-                  <div key={techKey} className="flex items-center space-x-1 bg-green-100 px-2 py-1 rounded">
+                  <div
+                    key={techKey}
+                    className="flex items-center space-x-1 bg-green-100 px-2 py-1 rounded"
+                  >
                     <span>{getTechIcon(techKey)}</span>
                     <span className="text-sm text-green-700">{tech.name}</span>
                   </div>
@@ -108,7 +121,7 @@ const ResearchTab: React.FC = () => {
             <h4 className="text-lg font-semibold text-gray-700 mb-4 border-b-2 border-gray-200 pb-2">
               {category} Technologies
             </h4>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {categoryTechs.map(({ key, tech }) => {
                 const isCompleted = research.completed.includes(key);
@@ -120,23 +133,32 @@ const ResearchTab: React.FC = () => {
                   <div
                     key={key}
                     className={`tech-card bg-white rounded-lg shadow-lg p-4 transition-all duration-200 hover:shadow-xl ${
-                      isCompleted ? 'bg-green-50 border-2 border-green-200' : 
-                      isInProgress ? 'bg-blue-50 border-2 border-blue-200' : ''
+                      isCompleted
+                        ? 'bg-green-50 border-2 border-green-200'
+                        : isInProgress
+                          ? 'bg-blue-50 border-2 border-blue-200'
+                          : ''
                     }`}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-2">
                         <span className="text-2xl">{getTechIcon(key)}</span>
                         <div>
-                          <h5 className="font-bold text-gray-800">{tech.name}</h5>
-                          <div className="text-xs text-gray-500">{category}</div>
+                          <h5 className="font-bold text-gray-800">
+                            {tech.name}
+                          </h5>
+                          <div className="text-xs text-gray-500">
+                            {category}
+                          </div>
                         </div>
                       </div>
                       {isCompleted && (
                         <div className="text-green-600 text-xl">✅</div>
                       )}
                       {isInProgress && (
-                        <div className="text-blue-600 text-xl animate-spin">🔬</div>
+                        <div className="text-blue-600 text-xl animate-spin">
+                          🔬
+                        </div>
                       )}
                     </div>
 
@@ -149,7 +171,9 @@ const ResearchTab: React.FC = () => {
 
                     {/* Research Cost */}
                     <div className="mb-3">
-                      <div className="text-xs text-gray-500 mb-1">Research Cost:</div>
+                      <div className="text-xs text-gray-500 mb-1">
+                        Research Cost:
+                      </div>
                       <div className="text-sm text-gray-700">
                         {formatCost(tech.cost)}
                       </div>
@@ -167,16 +191,24 @@ const ResearchTab: React.FC = () => {
                     ) : (
                       <button
                         onClick={() => handleStartResearch(key)}
-                        disabled={!canResearchTech || !canAffordTech || research.inProgress !== null}
+                        disabled={
+                          !canResearchTech ||
+                          !canAffordTech ||
+                          research.inProgress !== null
+                        }
                         className={`w-full px-3 py-2 rounded text-sm font-medium transition-all duration-200 ${
-                          canResearchTech && canAffordTech && research.inProgress === null
+                          canResearchTech &&
+                          canAffordTech &&
+                          research.inProgress === null
                             ? 'bg-purple-600 text-white hover:bg-purple-700 transform hover:scale-105'
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         }`}
                       >
-                        {!canAffordTech ? 'Insufficient Resources' :
-                         research.inProgress ? 'Research in Progress' :
-                         'Start Research'}
+                        {!canAffordTech
+                          ? 'Insufficient Resources'
+                          : research.inProgress
+                            ? 'Research in Progress'
+                            : 'Start Research'}
                       </button>
                     )}
                   </div>
@@ -193,8 +225,12 @@ const ResearchTab: React.FC = () => {
             Research Tips
           </h5>
           <ul className="text-sm text-purple-700 space-y-1">
-            <li>• Research technologies to gain permanent bonuses for your kingdom</li>
-            <li>• Only one research can be active at a time - choose wisely!</li>
+            <li>
+              • Research technologies to gain permanent bonuses for your kingdom
+            </li>
+            <li>
+              • Only one research can be active at a time - choose wisely!
+            </li>
             <li>• Economic technologies boost resource production</li>
             <li>• Military technologies make your army stronger</li>
             <li>• Research completes automatically after starting</li>

@@ -6,10 +6,10 @@ const KingdomCreation: React.FC = () => {
   const [kingdomFlag, setKingdomFlag] = useState<string | null>(null);
   const [flagPreview, setFlagPreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ name?: string }>({});
-  
-  const createKingdom = useGameStore(state => state.createKingdom);
-  const addNotification = useGameStore(state => state.addNotification);
-  const isKingdomCreated = useGameStore(state => state.isKingdomCreated);
+
+  const createKingdom = useGameStore((state) => state.createKingdom);
+  const addNotification = useGameStore((state) => state.addNotification);
+  const isKingdomCreated = useGameStore((state) => state.isKingdomCreated);
 
   const handleFlagUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -26,22 +26,22 @@ const KingdomCreation: React.FC = () => {
 
   const handleCreateKingdom = () => {
     const newErrors: { name?: string } = {};
-    
+
     if (!kingdomName.trim()) {
       newErrors.name = 'Kingdom name is required';
     } else if (kingdomName.trim().length < 3) {
       newErrors.name = 'Kingdom name must be at least 3 characters';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
+
     createKingdom(kingdomName.trim(), kingdomFlag);
     addNotification({
       type: 'success',
-      message: `Welcome to ${kingdomName.trim()}! Your kingdom has been established.`
+      message: `Welcome to ${kingdomName.trim()}! Your kingdom has been established.`,
     });
   };
 
@@ -59,13 +59,20 @@ const KingdomCreation: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
       <div className="card p-8 max-w-md w-full shadow-2xl">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-slate-800 mb-2 font-fantasy">Create Your Kingdom</h2>
-          <p className="text-slate-600">Begin your journey to conquest and glory</p>
+          <h2 className="text-3xl font-bold text-slate-800 mb-2 font-fantasy">
+            Create Your Kingdom
+          </h2>
+          <p className="text-slate-600">
+            Begin your journey to conquest and glory
+          </p>
         </div>
-        
+
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2" htmlFor="kingdomNameInput">
+            <label
+              className="block text-sm font-medium text-slate-700 mb-2"
+              htmlFor="kingdomNameInput"
+            >
               Kingdom Name
             </label>
             <input
@@ -91,9 +98,12 @@ const KingdomCreation: React.FC = () => {
               <p className="text-red-500 text-sm mt-1">{errors.name}</p>
             )}
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2" htmlFor="flagUpload">
+            <label
+              className="block text-sm font-medium text-slate-700 mb-2"
+              htmlFor="flagUpload"
+            >
               Kingdom Flag (Optional)
             </label>
             <input
@@ -106,16 +116,16 @@ const KingdomCreation: React.FC = () => {
             {flagPreview && (
               <div className="mt-4 flex justify-center">
                 <div className="border-2 border-slate-300 rounded-lg p-2">
-                  <img 
-                    src={flagPreview} 
-                    alt="Kingdom Flag Preview" 
+                  <img
+                    src={flagPreview}
+                    alt="Kingdom Flag Preview"
                     className="w-24 h-16 object-cover rounded"
                   />
                 </div>
               </div>
             )}
           </div>
-          
+
           <button
             onClick={handleCreateKingdom}
             disabled={!kingdomName.trim()}
@@ -124,7 +134,7 @@ const KingdomCreation: React.FC = () => {
             Create Kingdom
           </button>
         </div>
-        
+
         <div className="mt-8 text-center text-sm text-slate-500">
           <p>Your kingdom will be the foundation of your empire</p>
         </div>

@@ -8,7 +8,7 @@ import AlliancesTab from './game/AlliancesTab';
 import { useGameStore } from '../stores/gameStore';
 
 const GameInterface: React.FC = () => {
-  const isKingdomCreated = useGameStore(state => state.isKingdomCreated);
+  const isKingdomCreated = useGameStore((state) => state.isKingdomCreated);
 
   if (!isKingdomCreated) {
     return null;

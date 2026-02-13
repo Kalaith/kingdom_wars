@@ -3,9 +3,9 @@ import { useGameStore } from '../stores/gameStore';
 import type { TabType } from '../types';
 
 const NavigationTabs: React.FC = () => {
-  const currentTab = useGameStore(state => state.currentTab);
-  const setCurrentTab = useGameStore(state => state.setCurrentTab);
-  const isKingdomCreated = useGameStore(state => state.isKingdomCreated);
+  const currentTab = useGameStore((state) => state.currentTab);
+  const setCurrentTab = useGameStore((state) => state.setCurrentTab);
+  const isKingdomCreated = useGameStore((state) => state.isKingdomCreated);
 
   const tabs: { key: TabType; label: string; icon: string }[] = [
     { key: 'kingdom', label: 'Kingdom', icon: '🏰' },
@@ -13,7 +13,7 @@ const NavigationTabs: React.FC = () => {
     { key: 'military', label: 'Military', icon: '⚔️' },
     { key: 'attack', label: 'Attack', icon: '🗡️' },
     { key: 'research', label: 'Research', icon: '📚' },
-    { key: 'alliances', label: 'Alliances', icon: '🤝' }
+    { key: 'alliances', label: 'Alliances', icon: '🤝' },
   ];
 
   if (!isKingdomCreated) {
