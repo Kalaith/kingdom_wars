@@ -5,16 +5,14 @@ import type { Resources, TrainingQueueItem } from '../../types';
 import { formatNumber } from '../../utils/constants';
 
 const MilitaryTab: React.FC = () => {
-  const currentTab = useGameStore((state) => state.currentTab);
-  const army = useGameStore((state) => state.army);
-  const buildings = useGameStore((state) => state.buildings);
-  const trainingQueue = useGameStore((state) => state.trainingQueue);
-  const trainUnit = useGameStore((state) => state.trainUnit);
-  const canAfford = useGameStore((state) => state.canAfford);
+  const currentTab = useGameStore(state => state.currentTab);
+  const army = useGameStore(state => state.army);
+  const buildings = useGameStore(state => state.buildings);
+  const trainingQueue = useGameStore(state => state.trainingQueue);
+  const trainUnit = useGameStore(state => state.trainUnit);
+  const canAfford = useGameStore(state => state.canAfford);
 
-  const [selectedQuantities, setSelectedQuantities] = useState<
-    Record<string, number>
-  >({});
+  const [selectedQuantities, setSelectedQuantities] = useState<Record<string, number>>({});
 
   if (currentTab !== 'military') {
     return null;
@@ -49,7 +47,7 @@ const MilitaryTab: React.FC = () => {
   };
 
   const handleQuantityChange = (unitType: string, quantity: number) => {
-    setSelectedQuantities((prev) => ({
+    setSelectedQuantities(prev => ({
       ...prev,
       [unitType]: Math.max(1, quantity),
     }));
@@ -58,17 +56,14 @@ const MilitaryTab: React.FC = () => {
   const handleTrainUnit = (unitType: string) => {
     const quantity = selectedQuantities[unitType] || 1;
     if (trainUnit(unitType, quantity)) {
-      setSelectedQuantities((prev) => ({
+      setSelectedQuantities(prev => ({
         ...prev,
         [unitType]: 1,
       }));
     }
   };
 
-  const getTotalCost = (
-    unitType: string,
-    quantity: number
-  ): Partial<Resources> => {
+  const getTotalCost = (unitType: string, quantity: number): Partial<Resources> => {
     const unit = gameData.units[unitType];
     if (!unit) return {};
 
@@ -90,9 +85,7 @@ const MilitaryTab: React.FC = () => {
   return (
     <div className="bg-gray-50 p-6 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">
-          Military Forces
-        </h3>
+        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">Military Forces</h3>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Train Units */}
@@ -120,19 +113,14 @@ const MilitaryTab: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <span className="text-xl">{getUnitIcon(unitType)}</span>
                         <div>
-                          <h5 className="font-semibold text-slate-800">
-                            {unit.name}
-                          </h5>
+                          <h5 className="font-semibold text-slate-800">{unit.name}</h5>
                           <div className="text-xs text-slate-500">
-                            ATK: {unit.attack} | DEF: {unit.defense} | HP:{' '}
-                            {unit.health}
+                            ATK: {unit.attack} | DEF: {unit.defense} | HP: {unit.health}
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-slate-600">
-                          {unit.trainingTime}s each
-                        </div>
+                        <div className="text-sm text-slate-600">{unit.trainingTime}s each</div>
                       </div>
                     </div>
 
@@ -149,11 +137,8 @@ const MilitaryTab: React.FC = () => {
                           min="1"
                           max="100"
                           value={quantity}
-                          onChange={(e) =>
-                            handleQuantityChange(
-                              unitType,
-                              parseInt(e.target.value) || 1
-                            )
+                          onChange={e =>
+                            handleQuantityChange(unitType, parseInt(e.target.value) || 1)
                           }
                           className="w-16 px-2 py-1 border border-slate-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
@@ -206,12 +191,9 @@ const MilitaryTab: React.FC = () => {
                       <div className="flex items-center space-x-3">
                         <span className="text-xl">{getUnitIcon(unitType)}</span>
                         <div>
-                          <div className="font-semibold text-slate-800">
-                            {unit.name}
-                          </div>
+                          <div className="font-semibold text-slate-800">{unit.name}</div>
                           <div className="text-xs text-slate-500">
-                            ATK: {unit.attack} | DEF: {unit.defense} | HP:{' '}
-                            {unit.health}
+                            ATK: {unit.attack} | DEF: {unit.defense} | HP: {unit.health}
                           </div>
                         </div>
                       </div>
@@ -248,9 +230,7 @@ const MilitaryTab: React.FC = () => {
                     className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
                   >
                     <div className="flex items-center space-x-3">
-                      <span className="text-xl">
-                        {getUnitIcon(item.unitType)}
-                      </span>
+                      <span className="text-xl">{getUnitIcon(item.unitType)}</span>
                       <div>
                         <div className="font-semibold text-slate-800">
                           {item.quantity}x {unit.name}
@@ -280,17 +260,10 @@ const MilitaryTab: React.FC = () => {
             Military Tips
           </h5>
           <ul className="text-sm text-red-700 space-y-1">
-            <li>
-              • Train a diverse army with different unit types for maximum
-              effectiveness
-            </li>
-            <li>
-              • Higher-tier units are more powerful but cost more resources
-            </li>
+            <li>• Train a diverse army with different unit types for maximum effectiveness</li>
+            <li>• Higher-tier units are more powerful but cost more resources</li>
             <li>• Build military buildings to unlock new unit types</li>
-            <li>
-              • Keep training units to grow your army and increase your power
-            </li>
+            <li>• Keep training units to grow your army and increase your power</li>
           </ul>
         </div>
       </div>

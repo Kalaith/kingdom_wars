@@ -5,11 +5,11 @@ import type { Resources, Technology } from '../../types';
 import { formatNumber } from '../../utils/constants';
 
 const ResearchTab: React.FC = () => {
-  const currentTab = useGameStore((state) => state.currentTab);
-  const research = useGameStore((state) => state.research);
-  const startResearch = useGameStore((state) => state.startResearch);
-  const canResearch = useGameStore((state) => state.canResearch);
-  const canAfford = useGameStore((state) => state.canAfford);
+  const currentTab = useGameStore(state => state.currentTab);
+  const research = useGameStore(state => state.research);
+  const startResearch = useGameStore(state => state.startResearch);
+  const canResearch = useGameStore(state => state.canResearch);
+  const canAfford = useGameStore(state => state.canAfford);
 
   if (currentTab !== 'research') {
     return null;
@@ -61,9 +61,7 @@ const ResearchTab: React.FC = () => {
   return (
     <div className="bg-gray-50 p-6 min-h-screen">
       <div className="max-w-6xl mx-auto">
-        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">
-          Technology Research
-        </h3>
+        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">Technology Research</h3>
 
         {/* Research Status */}
         {research.inProgress && (
@@ -71,19 +69,14 @@ const ResearchTab: React.FC = () => {
             <div className="flex items-center space-x-3">
               <span className="text-2xl">🔬</span>
               <div>
-                <h4 className="font-semibold text-blue-800">
-                  Research in Progress
-                </h4>
+                <h4 className="font-semibold text-blue-800">Research in Progress</h4>
                 <p className="text-blue-600">
-                  Currently researching:{' '}
-                  {gameData.technologies[research.inProgress]?.name}
+                  Currently researching: {gameData.technologies[research.inProgress]?.name}
                 </p>
                 <div className="w-full bg-blue-200 rounded-full h-2 mt-2">
                   <div className="bg-blue-600 h-2 rounded-full w-1/3 animate-pulse"></div>
                 </div>
-                <p className="text-sm text-blue-500 mt-1">
-                  Research will complete automatically
-                </p>
+                <p className="text-sm text-blue-500 mt-1">Research will complete automatically</p>
               </div>
             </div>
           </div>
@@ -144,22 +137,12 @@ const ResearchTab: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <span className="text-2xl">{getTechIcon(key)}</span>
                         <div>
-                          <h5 className="font-bold text-gray-800">
-                            {tech.name}
-                          </h5>
-                          <div className="text-xs text-gray-500">
-                            {category}
-                          </div>
+                          <h5 className="font-bold text-gray-800">{tech.name}</h5>
+                          <div className="text-xs text-gray-500">{category}</div>
                         </div>
                       </div>
-                      {isCompleted && (
-                        <div className="text-green-600 text-xl">✅</div>
-                      )}
-                      {isInProgress && (
-                        <div className="text-blue-600 text-xl animate-spin">
-                          🔬
-                        </div>
-                      )}
+                      {isCompleted && <div className="text-green-600 text-xl">✅</div>}
+                      {isInProgress && <div className="text-blue-600 text-xl animate-spin">🔬</div>}
                     </div>
 
                     {/* Tech Effect */}
@@ -171,12 +154,8 @@ const ResearchTab: React.FC = () => {
 
                     {/* Research Cost */}
                     <div className="mb-3">
-                      <div className="text-xs text-gray-500 mb-1">
-                        Research Cost:
-                      </div>
-                      <div className="text-sm text-gray-700">
-                        {formatCost(tech.cost)}
-                      </div>
+                      <div className="text-xs text-gray-500 mb-1">Research Cost:</div>
+                      <div className="text-sm text-gray-700">{formatCost(tech.cost)}</div>
                     </div>
 
                     {/* Action Button */}
@@ -192,14 +171,10 @@ const ResearchTab: React.FC = () => {
                       <button
                         onClick={() => handleStartResearch(key)}
                         disabled={
-                          !canResearchTech ||
-                          !canAffordTech ||
-                          research.inProgress !== null
+                          !canResearchTech || !canAffordTech || research.inProgress !== null
                         }
                         className={`w-full px-3 py-2 rounded text-sm font-medium transition-all duration-200 ${
-                          canResearchTech &&
-                          canAffordTech &&
-                          research.inProgress === null
+                          canResearchTech && canAffordTech && research.inProgress === null
                             ? 'bg-purple-600 text-white hover:bg-purple-700 transform hover:scale-105'
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         }`}
@@ -225,12 +200,8 @@ const ResearchTab: React.FC = () => {
             Research Tips
           </h5>
           <ul className="text-sm text-purple-700 space-y-1">
-            <li>
-              • Research technologies to gain permanent bonuses for your kingdom
-            </li>
-            <li>
-              • Only one research can be active at a time - choose wisely!
-            </li>
+            <li>• Research technologies to gain permanent bonuses for your kingdom</li>
+            <li>• Only one research can be active at a time - choose wisely!</li>
             <li>• Economic technologies boost resource production</li>
             <li>• Military technologies make your army stronger</li>
             <li>• Research completes automatically after starting</li>

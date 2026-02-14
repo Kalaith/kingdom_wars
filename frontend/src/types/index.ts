@@ -119,13 +119,7 @@ export interface GameState {
 }
 
 // UI states
-export type TabType =
-  | 'kingdom'
-  | 'buildings'
-  | 'military'
-  | 'attack'
-  | 'research'
-  | 'alliances';
+export type TabType = 'kingdom' | 'buildings' | 'military' | 'attack' | 'research' | 'alliances';
 
 export interface NotificationData {
   id: string;

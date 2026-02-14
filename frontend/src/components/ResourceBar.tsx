@@ -3,11 +3,11 @@ import { useGameStore } from '../stores/gameStore';
 import type { Resources } from '../types';
 
 const ResourceBar: React.FC = () => {
-  const resources = useGameStore((state) => state.resources);
-  const kingdomName = useGameStore((state) => state.kingdom.name);
-  const kingdom = useGameStore((state) => state.kingdom);
-  const getProductionRates = useGameStore((state) => state.getProductionRates);
-  const getArmyPower = useGameStore((state) => state.getArmyPower);
+  const resources = useGameStore(state => state.resources);
+  const kingdomName = useGameStore(state => state.kingdom.name);
+  const kingdom = useGameStore(state => state.kingdom);
+  const getProductionRates = useGameStore(state => state.getProductionRates);
+  const getArmyPower = useGameStore(state => state.getArmyPower);
 
   const productionRates = getProductionRates();
   const armyPower = getArmyPower();
@@ -42,9 +42,7 @@ const ResourceBar: React.FC = () => {
               <div className="flex flex-col">
                 <span className="font-bold text-sm">{formatNumber(value)}</span>
                 {production > 0 && (
-                  <span className="text-xs text-green-400">
-                    +{formatNumber(production)}/min
-                  </span>
+                  <span className="text-xs text-green-400">+{formatNumber(production)}/min</span>
                 )}
               </div>
             </div>
@@ -56,10 +54,7 @@ const ResourceBar: React.FC = () => {
         <div>
           <div className="font-bold text-sm">{kingdomName || 'Kingdom'}</div>
           <div className="text-xs text-gray-300">
-            Power:{' '}
-            <span className="text-yellow-400 font-semibold">
-              {formatNumber(totalPower)}
-            </span>
+            Power: <span className="text-yellow-400 font-semibold">{formatNumber(totalPower)}</span>
           </div>
         </div>
       </div>

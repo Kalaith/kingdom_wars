@@ -3,10 +3,10 @@ import { useGameStore } from '../../stores/gameStore';
 import { formatNumber } from '../../utils/constants';
 
 const KingdomTab: React.FC = () => {
-  const currentTab = useGameStore((state) => state.currentTab);
-  const kingdom = useGameStore((state) => state.kingdom);
-  const getProductionRates = useGameStore((state) => state.getProductionRates);
-  const getArmyPower = useGameStore((state) => state.getArmyPower);
+  const currentTab = useGameStore(state => state.currentTab);
+  const kingdom = useGameStore(state => state.kingdom);
+  const getProductionRates = useGameStore(state => state.getProductionRates);
+  const getArmyPower = useGameStore(state => state.getArmyPower);
 
   const productionRates = getProductionRates();
   const armyPower = getArmyPower();
@@ -18,9 +18,7 @@ const KingdomTab: React.FC = () => {
   return (
     <div className="bg-gray-50 p-6 min-h-screen">
       <div className="max-w-6xl mx-auto">
-        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">
-          Kingdom Overview
-        </h3>
+        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">Kingdom Overview</h3>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Kingdom Overview */}
@@ -63,9 +61,7 @@ const KingdomTab: React.FC = () => {
                   <span className="text-slate-600">Happiness</span>
                   <span className="text-2xl">😊</span>
                 </div>
-                <div className="text-2xl font-bold text-green-600 mt-2">
-                  {kingdom.happiness}%
-                </div>
+                <div className="text-2xl font-bold text-green-600 mt-2">{kingdom.happiness}%</div>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg hover:bg-slate-100 transition-colors">

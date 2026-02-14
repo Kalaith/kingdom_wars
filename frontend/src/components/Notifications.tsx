@@ -3,8 +3,8 @@ import { useGameStore } from '../stores/gameStore';
 import type { NotificationData } from '../types';
 
 const Notifications: React.FC = () => {
-  const notifications = useGameStore((state) => state.notifications);
-  const removeNotification = useGameStore((state) => state.removeNotification);
+  const notifications = useGameStore(state => state.notifications);
+  const removeNotification = useGameStore(state => state.removeNotification);
 
   if (notifications.length === 0) {
     return null;
@@ -42,7 +42,7 @@ const Notifications: React.FC = () => {
 
   return (
     <div className="notifications fixed top-4 right-4 z-50 space-y-2 max-w-sm">
-      {notifications.map((notification) => (
+      {notifications.map(notification => (
         <div
           key={notification.id}
           className={`notification flex items-center p-4 rounded-lg shadow-lg text-white transform transition-all duration-300 ease-in-out ${getNotificationColors(
@@ -50,9 +50,7 @@ const Notifications: React.FC = () => {
           )} animate-slide-in-right`}
         >
           <div className="flex items-center space-x-3 flex-1">
-            <span className="text-lg">
-              {getNotificationIcon(notification.type)}
-            </span>
+            <span className="text-lg">{getNotificationIcon(notification.type)}</span>
             <span className="text-sm font-medium">{notification.message}</span>
           </div>
           <button

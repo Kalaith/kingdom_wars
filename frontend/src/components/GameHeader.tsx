@@ -4,7 +4,7 @@ import NavigationTabs from './NavigationTabs';
 import { useGameStore } from '../stores/gameStore';
 
 const GameHeader: React.FC = () => {
-  const isKingdomCreated = useGameStore((state) => state.isKingdomCreated);
+  const isKingdomCreated = useGameStore(state => state.isKingdomCreated);
 
   return (
     <header className="bg-gray-50 border-b border-gray-200">
@@ -14,9 +14,7 @@ const GameHeader: React.FC = () => {
             <h1 className="text-2xl md:text-3xl font-bold tracking-wide font-fantasy">
               Kingdom Wars
             </h1>
-            <p className="text-sm mt-1 opacity-90 font-light">
-              Build, Conquer, Rule
-            </p>
+            <p className="text-sm mt-1 opacity-90 font-light">Build, Conquer, Rule</p>
           </div>
         </div>
       </div>

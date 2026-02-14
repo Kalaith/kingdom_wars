@@ -28,12 +28,9 @@ class ErrorBoundary extends Component<Props, State> {
       return (
         this.props.fallback || (
           <div className="error-boundary p-6 bg-red-50 border border-red-200 rounded-lg">
-            <h2 className="text-xl font-bold text-red-800 mb-2">
-              Something went wrong
-            </h2>
+            <h2 className="text-xl font-bold text-red-800 mb-2">Something went wrong</h2>
             <p className="text-red-700 mb-4">
-              An unexpected error occurred. Please refresh the page or try again
-              later.
+              An unexpected error occurred. Please refresh the page or try again later.
             </p>
             <button
               onClick={() => window.location.reload()}

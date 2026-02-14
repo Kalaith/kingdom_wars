@@ -7,15 +7,15 @@ const KingdomCreation: React.FC = () => {
   const [flagPreview, setFlagPreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ name?: string }>({});
 
-  const createKingdom = useGameStore((state) => state.createKingdom);
-  const addNotification = useGameStore((state) => state.addNotification);
-  const isKingdomCreated = useGameStore((state) => state.isKingdomCreated);
+  const createKingdom = useGameStore(state => state.createKingdom);
+  const addNotification = useGameStore(state => state.addNotification);
+  const isKingdomCreated = useGameStore(state => state.isKingdomCreated);
 
   const handleFlagUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         const result = e.target?.result as string;
         setKingdomFlag(result);
         setFlagPreview(result);
@@ -62,9 +62,7 @@ const KingdomCreation: React.FC = () => {
           <h2 className="text-3xl font-bold text-slate-800 mb-2 font-fantasy">
             Create Your Kingdom
           </h2>
-          <p className="text-slate-600">
-            Begin your journey to conquest and glory
-          </p>
+          <p className="text-slate-600">Begin your journey to conquest and glory</p>
         </div>
 
         <div className="space-y-6">
@@ -79,7 +77,7 @@ const KingdomCreation: React.FC = () => {
               type="text"
               id="kingdomNameInput"
               value={kingdomName}
-              onChange={(e) => {
+              onChange={e => {
                 setKingdomName(e.target.value);
                 if (errors.name) {
                   const restErrors = { ...errors };
@@ -94,16 +92,11 @@ const KingdomCreation: React.FC = () => {
               placeholder="Enter your kingdom name"
               maxLength={20}
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-            )}
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
           </div>
 
           <div>
-            <label
-              className="block text-sm font-medium text-slate-700 mb-2"
-              htmlFor="flagUpload"
-            >
+            <label className="block text-sm font-medium text-slate-700 mb-2" htmlFor="flagUpload">
               Kingdom Flag (Optional)
             </label>
             <input

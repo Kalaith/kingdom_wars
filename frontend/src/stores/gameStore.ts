@@ -43,9 +43,7 @@ interface GameStore extends GameState {
   canResearch: (techKey: string) => boolean;
 
   // Utility
-  addNotification: (
-    notification: Omit<NotificationData, 'id' | 'timestamp'>
-  ) => void;
+  addNotification: (notification: Omit<NotificationData, 'id' | 'timestamp'>) => void;
   removeNotification: (id: string) => void;
   updateGameTime: () => void;
   saveGame: () => void;
@@ -91,16 +89,16 @@ export const useGameStore = create<GameStore>()(
       setCurrentTab: (tab: TabType) => set({ currentTab: tab }),
 
       createKingdom: (name: string, flag?: string | null) => {
-        set((state) => ({
+        set(state => ({
           kingdom: { ...state.kingdom, name, flag: flag || null },
           isKingdomCreated: true,
         }));
       },
 
       addResources: (resources: Partial<Resources>) => {
-        set((state) => {
+        set(state => {
           const newResources = { ...state.resources };
-          (Object.keys(resources) as Array<keyof Resources>).forEach((key) => {
+          (Object.keys(resources) as Array<keyof Resources>).forEach(key => {
             const value = resources[key];
             if (value !== undefined) {
               newResources[key] += value;
@@ -114,9 +112,9 @@ export const useGameStore = create<GameStore>()(
         const state = get();
         if (!state.canAfford(resources)) return false;
 
-        set((state) => {
+        set(state => {
           const newResources = { ...state.resources };
-          (Object.keys(resources) as Array<keyof Resources>).forEach((key) => {
+          (Object.keys(resources) as Array<keyof Resources>).forEach(key => {
             const value = resources[key];
             if (value !== undefined) {
               newResources[key] -= value;
@@ -129,7 +127,7 @@ export const useGameStore = create<GameStore>()(
 
       canAfford: (cost: Partial<Resources>) => {
         const { resources } = get();
-        return (Object.keys(cost) as Array<keyof Resources>).every((key) => {
+        return (Object.keys(cost) as Array<keyof Resources>).every(key => {
           const value = cost[key];
           return value === undefined || resources[key] >= value;
         });
@@ -173,7 +171,7 @@ export const useGameStore = create<GameStore>()(
         if (!upgradeCost || !state.canAfford(upgradeCost)) return false;
 
         if (state.subtractResources(upgradeCost)) {
-          set((state) => {
+          set(state => {
             const currentBuilding = state.buildings[buildingKey];
             if (!currentBuilding) return state;
 
@@ -253,7 +251,7 @@ export const useGameStore = create<GameStore>()(
             building: unit.building,
           };
 
-          set((state) => ({
+          set(state => ({
             trainingQueue: [...state.trainingQueue, trainingItem],
           }));
 
@@ -271,11 +269,11 @@ export const useGameStore = create<GameStore>()(
       processTrainingQueue: () => {
         const now = Date.now();
 
-        set((state) => {
+        set(state => {
           const completed: TrainingQueueItem[] = [];
           const remaining: TrainingQueueItem[] = [];
 
-          state.trainingQueue.forEach((item) => {
+          state.trainingQueue.forEach(item => {
             if (item.completionTime <= now) {
               completed.push(item);
             } else {
@@ -285,9 +283,8 @@ export const useGameStore = create<GameStore>()(
 
           // Add completed units to army
           const newArmy = { ...state.army };
-          completed.forEach((item) => {
-            newArmy[item.unitType] =
-              (newArmy[item.unitType] || 0) + item.quantity;
+          completed.forEach(item => {
+            newArmy[item.unitType] = (newArmy[item.unitType] || 0) + item.quantity;
           });
 
           return {
@@ -325,7 +322,7 @@ export const useGameStore = create<GameStore>()(
         if (!tech || !state.canResearch(techKey)) return false;
 
         if (state.subtractResources(tech.cost)) {
-          set((state) => ({
+          set(state => ({
             research: {
               ...state.research,
               inProgress: techKey,
@@ -349,7 +346,7 @@ export const useGameStore = create<GameStore>()(
       },
 
       completeResearch: () => {
-        set((state) => {
+        set(state => {
           if (!state.research.inProgress) return state;
 
           const completedTech = state.research.inProgress;
@@ -378,16 +375,14 @@ export const useGameStore = create<GameStore>()(
         );
       },
 
-      addNotification: (
-        notification: Omit<NotificationData, 'id' | 'timestamp'>
-      ) => {
+      addNotification: (notification: Omit<NotificationData, 'id' | 'timestamp'>) => {
         const newNotification: NotificationData = {
           ...notification,
           id: `notification-${Date.now()}-${Math.random()}`,
           timestamp: Date.now(),
         };
 
-        set((state) => ({
+        set(state => ({
           notifications: [...state.notifications, newNotification],
         }));
 
@@ -399,8 +394,8 @@ export const useGameStore = create<GameStore>()(
       },
 
       removeNotification: (id: string) => {
-        set((state) => ({
-          notifications: state.notifications.filter((n) => n.id !== id),
+        set(state => ({
+          notifications: state.notifications.filter(n => n.id !== id),
         }));
       },
 
@@ -439,7 +434,7 @@ export const useGameStore = create<GameStore>()(
     })),
     {
       name: 'kingdomWarsGameState',
-      partialize: (state) => ({
+      partialize: state => ({
         kingdom: state.kingdom,
         resources: state.resources,
         buildings: state.buildings,

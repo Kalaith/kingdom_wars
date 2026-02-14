@@ -3,9 +3,9 @@ import { useGameStore } from '../../stores/gameStore';
 import { formatNumber } from '../../utils/constants';
 
 const AlliancesTab: React.FC = () => {
-  const currentTab = useGameStore((state) => state.currentTab);
-  const alliance = useGameStore((state) => state.alliance);
-  const addNotification = useGameStore((state) => state.addNotification);
+  const currentTab = useGameStore(state => state.currentTab);
+  const alliance = useGameStore(state => state.alliance);
+  const addNotification = useGameStore(state => state.addNotification);
 
   if (currentTab !== 'alliances') {
     return null;
@@ -19,8 +19,7 @@ const AlliancesTab: React.FC = () => {
       members: 15,
       power: 25000,
       level: 3,
-      description:
-        'Elite alliance of powerful kingdoms focused on conquest and dominance.',
+      description: 'Elite alliance of powerful kingdoms focused on conquest and dominance.',
       requirements: { minPower: 2000, minLevel: 5 },
     },
     {
@@ -29,8 +28,7 @@ const AlliancesTab: React.FC = () => {
       members: 28,
       power: 35000,
       level: 4,
-      description:
-        'Defensive alliance promoting mutual protection and resource sharing.',
+      description: 'Defensive alliance promoting mutual protection and resource sharing.',
       requirements: { minPower: 1000, minLevel: 3 },
     },
     {
@@ -39,8 +37,7 @@ const AlliancesTab: React.FC = () => {
       members: 42,
       power: 28000,
       level: 2,
-      description:
-        'Trade-focused alliance specializing in economic growth and resource trading.',
+      description: 'Trade-focused alliance specializing in economic growth and resource trading.',
       requirements: { minPower: 500, minLevel: 2 },
     },
     {
@@ -49,16 +46,13 @@ const AlliancesTab: React.FC = () => {
       members: 22,
       power: 45000,
       level: 5,
-      description:
-        'Military alliance of seasoned warriors seeking glorious battles.',
+      description: 'Military alliance of seasoned warriors seeking glorious battles.',
       requirements: { minPower: 3000, minLevel: 7 },
     },
   ];
 
   const handleJoinAlliance = (allianceId: string) => {
-    const selectedAllianceData = availableAlliances.find(
-      (a) => a.id === allianceId
-    );
+    const selectedAllianceData = availableAlliances.find(a => a.id === allianceId);
     if (!selectedAllianceData) return;
 
     // Simulate joining alliance
@@ -100,9 +94,7 @@ const AlliancesTab: React.FC = () => {
   return (
     <div className="bg-gray-50 p-6 min-h-screen">
       <div className="max-w-6xl mx-auto">
-        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">
-          Alliances
-        </h3>
+        <h3 className="text-3xl font-bold text-slate-800 mb-6 font-fantasy">Alliances</h3>
 
         {/* Current Alliance Status */}
         <div className="card p-6 mb-6">
@@ -115,9 +107,7 @@ const AlliancesTab: React.FC = () => {
             <div className="text-center py-8 text-slate-500">
               <div className="text-4xl mb-2">🏴</div>
               <p className="text-lg font-medium">No Alliance</p>
-              <p className="text-sm">
-                Join an alliance for mutual protection and benefits!
-              </p>
+              <p className="text-sm">Join an alliance for mutual protection and benefits!</p>
             </div>
           ) : (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -125,12 +115,8 @@ const AlliancesTab: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">👑</span>
                   <div>
-                    <h5 className="font-bold text-green-800">
-                      {alliance.name}
-                    </h5>
-                    <p className="text-green-600">
-                      Level {alliance.level} Alliance
-                    </p>
+                    <h5 className="font-bold text-green-800">{alliance.name}</h5>
+                    <p className="text-green-600">Level {alliance.level} Alliance</p>
                     <p className="text-sm text-green-500">
                       {alliance.members?.length || 0} members
                     </p>
@@ -156,30 +142,22 @@ const AlliancesTab: React.FC = () => {
             </h4>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {availableAlliances.map((allianceData) => (
+              {availableAlliances.map(allianceData => (
                 <div
                   key={allianceData.id}
                   className={`alliance-card border rounded-lg p-4 transition-all duration-200 hover:shadow-md ${getAllianceColor(allianceData.id)}`}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
-                      <span className="text-2xl">
-                        {getAllianceIcon(allianceData.id)}
-                      </span>
+                      <span className="text-2xl">{getAllianceIcon(allianceData.id)}</span>
                       <div>
-                        <h5 className="font-bold text-gray-800">
-                          {allianceData.name}
-                        </h5>
-                        <div className="text-sm text-gray-500">
-                          Level {allianceData.level}
-                        </div>
+                        <h5 className="font-bold text-gray-800">{allianceData.name}</h5>
+                        <div className="text-sm text-gray-500">Level {allianceData.level}</div>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-700 mb-3">
-                    {allianceData.description}
-                  </p>
+                  <p className="text-sm text-gray-700 mb-3">{allianceData.description}</p>
 
                   {/* Alliance Stats */}
                   <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
@@ -195,13 +173,10 @@ const AlliancesTab: React.FC = () => {
 
                   {/* Requirements */}
                   <div className="mb-3 p-2 bg-white bg-opacity-50 rounded">
-                    <div className="text-xs text-gray-600 mb-1">
-                      Requirements:
-                    </div>
+                    <div className="text-xs text-gray-600 mb-1">Requirements:</div>
                     <div className="text-xs text-gray-700">
-                      Min Power:{' '}
-                      {formatNumber(allianceData.requirements.minPower)} | Min
-                      Level: {allianceData.requirements.minLevel}
+                      Min Power: {formatNumber(allianceData.requirements.minPower)} | Min Level:{' '}
+                      {allianceData.requirements.minLevel}
                     </div>
                   </div>
 
@@ -228,9 +203,7 @@ const AlliancesTab: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="benefit-card text-center p-4 bg-blue-50 rounded-lg">
               <div className="text-2xl mb-2">🛡️</div>
-              <div className="font-semibold text-gray-700">
-                Mutual Protection
-              </div>
+              <div className="font-semibold text-gray-700">Mutual Protection</div>
               <div className="text-sm text-gray-500 mt-1">
                 Alliance members can help defend against attacks
               </div>
@@ -238,9 +211,7 @@ const AlliancesTab: React.FC = () => {
 
             <div className="benefit-card text-center p-4 bg-green-50 rounded-lg">
               <div className="text-2xl mb-2">🤝</div>
-              <div className="font-semibold text-gray-700">
-                Resource Sharing
-              </div>
+              <div className="font-semibold text-gray-700">Resource Sharing</div>
               <div className="text-sm text-gray-500 mt-1">
                 Share resources with alliance members in need
               </div>
@@ -248,9 +219,7 @@ const AlliancesTab: React.FC = () => {
 
             <div className="benefit-card text-center p-4 bg-purple-50 rounded-lg">
               <div className="text-2xl mb-2">⚔️</div>
-              <div className="font-semibold text-gray-700">
-                Coordinated Attacks
-              </div>
+              <div className="font-semibold text-gray-700">Coordinated Attacks</div>
               <div className="text-sm text-gray-500 mt-1">
                 Launch joint attacks against powerful enemies
               </div>
@@ -267,12 +236,8 @@ const AlliancesTab: React.FC = () => {
           <ul className="text-sm text-blue-700 space-y-1">
             <li>• Choose an alliance that matches your playstyle and goals</li>
             <li>• Active alliances provide better support and coordination</li>
-            <li>
-              • Higher level alliances offer better bonuses and protection
-            </li>
-            <li>
-              • Contribute to your alliance through participation and resources
-            </li>
+            <li>• Higher level alliances offer better bonuses and protection</li>
+            <li>• Contribute to your alliance through participation and resources</li>
             <li>• Alliance membership can be changed, but choose wisely</li>
           </ul>
         </div>

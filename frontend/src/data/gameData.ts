@@ -1,9 +1,4 @@
-import type {
-  BuildingData,
-  UnitData,
-  TechnologyData,
-  EnemyKingdom,
-} from '../types';
+import type { BuildingData, UnitData, TechnologyData, EnemyKingdom } from '../types';
 
 export const gameData = {
   buildings: {
