@@ -53,9 +53,9 @@ const BuildingsTab: React.FC = () => {
     return 'Core Buildings';
   };
 
-  const handleUpgrade = (buildingKey: string) => {
+  const handleUpgrade = async (buildingKey: string) => {
     if (canUpgradeBuilding(buildingKey)) {
-      upgradeBuilding(buildingKey);
+      await upgradeBuilding(buildingKey);
     }
   };
 
@@ -138,7 +138,7 @@ const BuildingsTab: React.FC = () => {
                         )}
 
                         <button
-                          onClick={() => handleUpgrade(key)}
+                          onClick={() => void handleUpgrade(key)}
                           disabled={!canUpgrade || !canAffordUpgrade}
                           className={`btn w-full ${
                             canUpgrade && canAffordUpgrade

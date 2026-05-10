@@ -53,9 +53,9 @@ const MilitaryTab: React.FC = () => {
     }));
   };
 
-  const handleTrainUnit = (unitType: string) => {
+  const handleTrainUnit = async (unitType: string) => {
     const quantity = selectedQuantities[unitType] || 1;
-    if (trainUnit(unitType, quantity)) {
+    if (await trainUnit(unitType, quantity)) {
       setSelectedQuantities(prev => ({
         ...prev,
         [unitType]: 1,
@@ -146,7 +146,7 @@ const MilitaryTab: React.FC = () => {
                           Cost: {formatCost(totalCost)}
                         </div>
                         <button
-                          onClick={() => handleTrainUnit(unitType)}
+                          onClick={() => void handleTrainUnit(unitType)}
                           disabled={!canAffordTraining}
                           className={`btn btn-sm ${
                             canAffordTraining

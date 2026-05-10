@@ -9,8 +9,7 @@ export const GamePage: React.FC = () => {
   const loadGame = useGameStore(state => state.loadGame);
 
   useEffect(() => {
-    // Load saved game state on app start
-    loadGame();
+    void loadGame();
   }, [loadGame]);
 
   return (

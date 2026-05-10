@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { gameData } from '../../data/gameData';
-import type { EnemyKingdom, Resources } from '../../types';
+import type { EnemyKingdom } from '../../types';
 import { formatNumber } from '../../utils/constants';
 
 const AttackTab: React.FC = () => {
   const currentTab = useGameStore(state => state.currentTab);
   const army = useGameStore(state => state.army);
   const getArmyPower = useGameStore(state => state.getArmyPower);
-  const addResources = useGameStore(state => state.addResources);
+  const attackKingdom = useGameStore(state => state.attackKingdom);
   const addNotification = useGameStore(state => state.addNotification);
 
   const [selectedTarget, setSelectedTarget] = useState<EnemyKingdom | null>(null);
@@ -32,30 +32,6 @@ const AttackTab: React.FC = () => {
     return { text: 'Very Risky', color: 'text-red-600' };
   };
 
-  const simulateBattle = (
-    enemy: EnemyKingdom
-  ): { victory: boolean; resourcesGained: Resources; losses: number } => {
-    const powerRatio = armyPower / enemy.power;
-    const randomFactor = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
-    const adjustedRatio = powerRatio * randomFactor;
-
-    const victory = adjustedRatio > 1;
-
-    // Calculate resources gained
-    const lootPercentage = victory ? 0.1 + Math.random() * 0.15 : 0.02 + Math.random() * 0.05;
-    const resourcesGained = {
-      gold: Math.floor(enemy.resources.gold * lootPercentage),
-      food: Math.floor(enemy.resources.food * lootPercentage),
-      wood: Math.floor(enemy.resources.wood * lootPercentage),
-      stone: Math.floor(enemy.resources.stone * lootPercentage),
-    };
-
-    // Calculate losses (percentage of army lost)
-    const lossPercentage = victory ? Math.random() * 0.1 : 0.2 + Math.random() * 0.3;
-
-    return { victory, resourcesGained, losses: lossPercentage };
-  };
-
   const handleAttack = async (enemy: EnemyKingdom) => {
     if (!hasArmy || attackInProgress) return;
 
@@ -65,13 +41,17 @@ const AttackTab: React.FC = () => {
     // Simulate battle delay
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    const battleResult = simulateBattle(enemy);
+    const battleResult = await attackKingdom(enemy);
+    if (!battleResult) {
+      setAttackInProgress(false);
+      setSelectedTarget(null);
+      return;
+    }
 
-    if (battleResult.victory) {
-      addResources(battleResult.resourcesGained);
+    if (battleResult.result === 'victory') {
       addNotification({
         type: 'success',
-        message: `Victory against ${enemy.name}! Gained ${formatNumber(battleResult.resourcesGained.gold)} gold and other resources.`,
+        message: `Victory against ${enemy.name}! Gained ${formatNumber(battleResult.resourcesGained.gold || 0)} gold and other resources.`,
         duration: 8000,
       });
     } else {
@@ -83,11 +63,10 @@ const AttackTab: React.FC = () => {
     }
 
     // Apply army losses (simplified - just reduce unit counts)
-    if (battleResult.losses > 0) {
-      // This would need more complex logic to actually remove units
+    if ((battleResult.lossPercentage || 0) > 0) {
       addNotification({
         type: 'warning',
-        message: `You lost ${Math.floor(battleResult.losses * 100)}% of your attacking force.`,
+        message: `You lost ${Math.floor((battleResult.lossPercentage || 0) * 100)}% of your attacking force.`,
         duration: 6000,
       });
     }
@@ -220,7 +199,7 @@ const AttackTab: React.FC = () => {
 
                     {/* Attack Button */}
                     <button
-                      onClick={() => handleAttack(enemy)}
+                      onClick={() => void handleAttack(enemy)}
                       disabled={attackInProgress}
                       className={`w-full px-4 py-2 rounded font-medium transition-all duration-200 ${
                         isBeingAttacked

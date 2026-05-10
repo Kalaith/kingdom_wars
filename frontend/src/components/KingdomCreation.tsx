@@ -24,7 +24,7 @@ const KingdomCreation: React.FC = () => {
     }
   };
 
-  const handleCreateKingdom = () => {
+  const handleCreateKingdom = async () => {
     const newErrors: { name?: string } = {};
 
     if (!kingdomName.trim()) {
@@ -38,16 +38,18 @@ const KingdomCreation: React.FC = () => {
       return;
     }
 
-    createKingdom(kingdomName.trim(), kingdomFlag);
-    addNotification({
-      type: 'success',
-      message: `Welcome to ${kingdomName.trim()}! Your kingdom has been established.`,
-    });
+    const created = await createKingdom(kingdomName.trim(), kingdomFlag);
+    if (created) {
+      addNotification({
+        type: 'success',
+        message: `Welcome to ${kingdomName.trim()}! Your kingdom has been established.`,
+      });
+    }
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      handleCreateKingdom();
+      void handleCreateKingdom();
     }
   };
 
@@ -120,7 +122,7 @@ const KingdomCreation: React.FC = () => {
           </div>
 
           <button
-            onClick={handleCreateKingdom}
+            onClick={() => void handleCreateKingdom()}
             disabled={!kingdomName.trim()}
             className="btn btn-primary w-full py-4 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >

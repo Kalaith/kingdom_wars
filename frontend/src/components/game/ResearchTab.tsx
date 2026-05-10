@@ -41,9 +41,9 @@ const ResearchTab: React.FC = () => {
     return 'General';
   };
 
-  const handleStartResearch = (techKey: string) => {
+  const handleStartResearch = async (techKey: string) => {
     if (canResearch(techKey)) {
-      startResearch(techKey);
+      await startResearch(techKey);
     }
   };
 
@@ -169,7 +169,7 @@ const ResearchTab: React.FC = () => {
                       </div>
                     ) : (
                       <button
-                        onClick={() => handleStartResearch(key)}
+                        onClick={() => void handleStartResearch(key)}
                         disabled={
                           !canResearchTech || !canAffordTech || research.inProgress !== null
                         }

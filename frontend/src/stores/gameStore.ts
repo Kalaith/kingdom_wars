@@ -1,53 +1,48 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { subscribeWithSelector } from 'zustand/middleware';
 import type {
   GameState,
   Resources,
-  TrainingQueueItem,
   ProductionRates,
   TabType,
   NotificationData,
+  EnemyKingdom,
+  BattleReport,
 } from '../types';
 import { gameData } from '../data/gameData';
+import { webhatcheryGameApi, type WebHatcheryGameState } from '../api/webhatcheryGameApi';
+import { useWebHatcherySessionStore } from './webhatcherySessionStore';
+
+interface BackendBattleResult extends BattleReport {
+  lossPercentage?: number;
+}
 
 interface GameStore extends GameState {
-  // UI State
   currentTab: TabType;
   notifications: NotificationData[];
   isKingdomCreated: boolean;
-
-  // Actions
+  isLoading: boolean;
+  error: string | null;
   setCurrentTab: (tab: TabType) => void;
-  createKingdom: (name: string, flag?: string | null) => void;
-
-  // Resource management
-  addResources: (resources: Partial<Resources>) => void;
-  subtractResources: (resources: Partial<Resources>) => boolean;
+  createKingdom: (name: string, flag?: string | null) => Promise<boolean>;
+  addResources: (resources: Partial<Resources>) => Promise<boolean>;
+  subtractResources: (resources: Partial<Resources>) => Promise<boolean>;
   canAfford: (cost: Partial<Resources>) => boolean;
   getProductionRates: () => ProductionRates;
-
-  // Building management
-  upgradeBuilding: (buildingKey: string) => boolean;
+  upgradeBuilding: (buildingKey: string) => Promise<boolean>;
   getBuildingUpgradeCost: (buildingKey: string) => Partial<Resources> | null;
   canUpgradeBuilding: (buildingKey: string) => boolean;
-
-  // Unit management
-  trainUnit: (unitType: string, quantity: number) => boolean;
-  processTrainingQueue: () => void;
+  trainUnit: (unitType: string, quantity: number) => Promise<boolean>;
+  processTrainingQueue: () => Promise<void>;
   getArmyPower: () => number;
-
-  // Research management
-  startResearch: (techKey: string) => boolean;
-  completeResearch: () => void;
+  startResearch: (techKey: string) => Promise<boolean>;
+  completeResearch: () => Promise<void>;
   canResearch: (techKey: string) => boolean;
-
-  // Utility
+  attackKingdom: (enemy: EnemyKingdom) => Promise<BackendBattleResult | null>;
   addNotification: (notification: Omit<NotificationData, 'id' | 'timestamp'>) => void;
   removeNotification: (id: string) => void;
-  updateGameTime: () => void;
-  saveGame: () => void;
-  loadGame: () => void;
+  updateGameTime: () => Promise<void>;
+  saveGame: () => Promise<void>;
+  loadGame: () => Promise<void>;
 }
 
 const initialGameState: GameState = {
@@ -78,382 +73,277 @@ const initialGameState: GameState = {
   battleReports: [],
 };
 
-export const useGameStore = create<GameStore>()(
-  persist(
-    subscribeWithSelector((set, get) => ({
-      ...initialGameState,
-      currentTab: 'kingdom' as TabType,
-      notifications: [],
-      isKingdomCreated: false,
-
-      setCurrentTab: (tab: TabType) => set({ currentTab: tab }),
-
-      createKingdom: (name: string, flag?: string | null) => {
-        set(state => ({
-          kingdom: { ...state.kingdom, name, flag: flag || null },
-          isKingdomCreated: true,
-        }));
-      },
-
-      addResources: (resources: Partial<Resources>) => {
-        set(state => {
-          const newResources = { ...state.resources };
-          (Object.keys(resources) as Array<keyof Resources>).forEach(key => {
-            const value = resources[key];
-            if (value !== undefined) {
-              newResources[key] += value;
-            }
-          });
-          return { resources: newResources };
-        });
-      },
-
-      subtractResources: (resources: Partial<Resources>) => {
-        const state = get();
-        if (!state.canAfford(resources)) return false;
-
-        set(state => {
-          const newResources = { ...state.resources };
-          (Object.keys(resources) as Array<keyof Resources>).forEach(key => {
-            const value = resources[key];
-            if (value !== undefined) {
-              newResources[key] -= value;
-            }
-          });
-          return { resources: newResources };
-        });
-        return true;
-      },
-
-      canAfford: (cost: Partial<Resources>) => {
-        const { resources } = get();
-        return (Object.keys(cost) as Array<keyof Resources>).every(key => {
-          const value = cost[key];
-          return value === undefined || resources[key] >= value;
-        });
-      },
-
-      getProductionRates: () => {
-        const { buildings, research } = get();
-        const baseRates = { gold: 0, food: 0, wood: 0, stone: 0 };
-
-        // Calculate base production from buildings
-        Object.entries(buildings).forEach(([key, building]) => {
-          if (building.production && building.level > 0) {
-            const production = building.production * building.level;
-
-            if (key === 'goldMine') baseRates.gold += production;
-            else if (key === 'farm') baseRates.food += production;
-            else if (key === 'lumberMill') baseRates.wood += production;
-            else if (key === 'stoneQuarry') baseRates.stone += production;
-          }
-        });
-
-        // Apply research bonuses
-        if (research.completed.includes('agriculture')) {
-          baseRates.food *= 1.5;
-        }
-        if (research.completed.includes('mining')) {
-          baseRates.gold *= 1.4;
-          baseRates.stone *= 1.4;
-        }
-
-        return baseRates;
-      },
-
-      upgradeBuilding: (buildingKey: string) => {
-        const state = get();
-        const building = state.buildings[buildingKey];
-
-        if (!building || building.level >= building.maxLevel) return false;
-
-        const upgradeCost = state.getBuildingUpgradeCost(buildingKey);
-        if (!upgradeCost || !state.canAfford(upgradeCost)) return false;
-
-        if (state.subtractResources(upgradeCost)) {
-          set(state => {
-            const currentBuilding = state.buildings[buildingKey];
-            if (!currentBuilding) return state;
-
-            return {
-              buildings: {
-                ...state.buildings,
-                [buildingKey]: {
-                  ...currentBuilding,
-                  level: currentBuilding.level + 1,
-                },
-              },
-            };
-          });
-
-          get().addNotification({
-            type: 'success',
-            message: `${building.name} upgraded to level ${building.level + 1}!`,
-          });
-
-          return true;
-        }
-
-        return false;
-      },
-
-      getBuildingUpgradeCost: (buildingKey: string) => {
-        const { buildings } = get();
-        const building = buildings[buildingKey];
-
-        if (!building || building.level >= building.maxLevel) return null;
-
-        // Calculate upgrade cost (increases by 1.5x per level)
-        const multiplier = Math.pow(1.5, building.level);
-        return {
-          gold: Math.floor(building.cost.gold * multiplier),
-          food: Math.floor(building.cost.food * multiplier),
-          wood: Math.floor(building.cost.wood * multiplier),
-          stone: Math.floor(building.cost.stone * multiplier),
-        };
-      },
-
-      canUpgradeBuilding: (buildingKey: string) => {
-        const state = get();
-        const building = state.buildings[buildingKey];
-
-        if (!building || building.level >= building.maxLevel) return false;
-
-        const upgradeCost = state.getBuildingUpgradeCost(buildingKey);
-        return upgradeCost ? state.canAfford(upgradeCost) : false;
-      },
-
-      trainUnit: (unitType: string, quantity: number) => {
-        const state = get();
-        const unit = gameData.units[unitType];
-
-        if (!unit) return false;
-
-        const totalCost = {
-          gold: (unit.cost.gold || 0) * quantity,
-          food: (unit.cost.food || 0) * quantity,
-          wood: (unit.cost.wood || 0) * quantity,
-          stone: (unit.cost.stone || 0) * quantity,
-        };
-
-        if (!state.canAfford(totalCost)) return false;
-
-        // Check if required building exists and is built
-        const requiredBuilding = state.buildings[unit.building];
-        if (!requiredBuilding || requiredBuilding.level === 0) return false;
-
-        if (state.subtractResources(totalCost)) {
-          const trainingItem: TrainingQueueItem = {
-            id: `${unitType}-${Date.now()}`,
-            unitType,
-            quantity,
-            completionTime: Date.now() + unit.trainingTime * 1000 * quantity,
-            building: unit.building,
-          };
-
-          set(state => ({
-            trainingQueue: [...state.trainingQueue, trainingItem],
-          }));
-
-          get().addNotification({
-            type: 'success',
-            message: `Training ${quantity} ${unit.name}${quantity > 1 ? 's' : ''}...`,
-          });
-
-          return true;
-        }
-
-        return false;
-      },
-
-      processTrainingQueue: () => {
-        const now = Date.now();
-
-        set(state => {
-          const completed: TrainingQueueItem[] = [];
-          const remaining: TrainingQueueItem[] = [];
-
-          state.trainingQueue.forEach(item => {
-            if (item.completionTime <= now) {
-              completed.push(item);
-            } else {
-              remaining.push(item);
-            }
-          });
-
-          // Add completed units to army
-          const newArmy = { ...state.army };
-          completed.forEach(item => {
-            newArmy[item.unitType] = (newArmy[item.unitType] || 0) + item.quantity;
-          });
-
-          return {
-            trainingQueue: remaining,
-            army: newArmy,
-          };
-        });
-      },
-
-      getArmyPower: () => {
-        const { army, research } = get();
-        let totalPower = 0;
-
-        Object.entries(army).forEach(([unitType, count]) => {
-          const unit = gameData.units[unitType];
-          if (unit) {
-            let unitPower = unit.attack + unit.defense + unit.health;
-
-            // Apply research bonuses
-            if (research.completed.includes('ironWorking')) {
-              unitPower *= 1.2; // 20% attack boost affects overall power
-            }
-
-            totalPower += unitPower * count;
-          }
-        });
-
-        return Math.floor(totalPower);
-      },
-
-      startResearch: (techKey: string) => {
-        const state = get();
-        const tech = gameData.technologies[techKey];
-
-        if (!tech || !state.canResearch(techKey)) return false;
-
-        if (state.subtractResources(tech.cost)) {
-          set(state => ({
-            research: {
-              ...state.research,
-              inProgress: techKey,
-            },
-          }));
-
-          get().addNotification({
-            type: 'success',
-            message: `Research started: ${tech.name}`,
-          });
-
-          // Auto-complete research after 60 seconds (for demo purposes)
-          setTimeout(() => {
-            get().completeResearch();
-          }, 60000);
-
-          return true;
-        }
-
-        return false;
-      },
-
-      completeResearch: () => {
-        set(state => {
-          if (!state.research.inProgress) return state;
-
-          const completedTech = state.research.inProgress;
-          const tech = gameData.technologies[completedTech];
-
-          get().addNotification({
-            type: 'success',
-            message: `Research completed: ${tech?.name}!`,
-          });
-
-          return {
-            research: {
-              completed: [...state.research.completed, completedTech],
-              inProgress: null,
-            },
-          };
-        });
-      },
-
-      canResearch: (techKey: string) => {
-        const { research } = get();
-        return (
-          !research.completed.includes(techKey) &&
-          research.inProgress !== techKey &&
-          research.inProgress === null
-        );
-      },
-
-      addNotification: (notification: Omit<NotificationData, 'id' | 'timestamp'>) => {
-        const newNotification: NotificationData = {
-          ...notification,
-          id: `notification-${Date.now()}-${Math.random()}`,
-          timestamp: Date.now(),
-        };
-
-        set(state => ({
-          notifications: [...state.notifications, newNotification],
-        }));
-
-        // Auto-remove notification after duration
-        const duration = notification.duration || 5000;
-        setTimeout(() => {
-          get().removeNotification(newNotification.id);
-        }, duration);
-      },
-
-      removeNotification: (id: string) => {
-        set(state => ({
-          notifications: state.notifications.filter(n => n.id !== id),
-        }));
-      },
-
-      updateGameTime: () => {
-        const now = Date.now();
-        const state = get();
-        const timeDiff = now - state.lastUpdate;
-
-        // Process training queue
-        state.processTrainingQueue();
-
-        // Add resource production (every minute)
-        if (timeDiff > 60000) {
-          // 1 minute
-          const productionRates = state.getProductionRates();
-          const productionAmount = {
-            gold: Math.floor(productionRates.gold * (timeDiff / 60000)),
-            food: Math.floor(productionRates.food * (timeDiff / 60000)),
-            wood: Math.floor(productionRates.wood * (timeDiff / 60000)),
-            stone: Math.floor(productionRates.stone * (timeDiff / 60000)),
-          };
-
-          state.addResources(productionAmount);
-
-          set({ lastUpdate: now });
-        }
-      },
-
-      saveGame: () => {
-        // Zustand persist handles saving automatically
-      },
-
-      loadGame: () => {
-        // Zustand persist handles loading automatically
-      },
-    })),
-    {
-      name: 'kingdomWarsGameState',
-      partialize: state => ({
-        kingdom: state.kingdom,
-        resources: state.resources,
-        buildings: state.buildings,
-        army: state.army,
-        trainingQueue: state.trainingQueue,
-        research: state.research,
-        alliance: state.alliance,
-        lastUpdate: state.lastUpdate,
-        tutorialCompleted: state.tutorialCompleted,
-        actionCooldowns: state.actionCooldowns,
-        battleReports: state.battleReports,
-        isKingdomCreated: state.isKingdomCreated,
-      }),
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const applyBackendGame = (game: WebHatcheryGameState): void => {
+  const state = game.save.state;
+  if (!isRecord(state) || !isRecord(state.resources) || !isRecord(state.buildings)) {
+    useGameStore.setState({ isLoading: false, error: 'Backend returned an invalid kingdom state.' });
+    return;
+  }
+
+  useGameStore.setState({
+    kingdom: isRecord(state.kingdom) ? (state.kingdom as unknown as GameState['kingdom']) : initialGameState.kingdom,
+    resources: state.resources as unknown as Resources,
+    buildings: state.buildings as unknown as GameState['buildings'],
+    army: isRecord(state.army) ? (state.army as unknown as GameState['army']) : {},
+    trainingQueue: Array.isArray(state.trainingQueue) ? (state.trainingQueue as GameState['trainingQueue']) : [],
+    research: isRecord(state.research) ? (state.research as unknown as GameState['research']) : initialGameState.research,
+    alliance: isRecord(state.alliance) ? (state.alliance as unknown as GameState['alliance']) : null,
+    lastUpdate: typeof state.lastUpdate === 'number' ? state.lastUpdate : Date.now(),
+    tutorialCompleted: state.tutorialCompleted === true,
+    actionCooldowns: isRecord(state.actionCooldowns) ? (state.actionCooldowns as GameState['actionCooldowns']) : {},
+    battleReports: Array.isArray(state.battleReports) ? (state.battleReports as GameState['battleReports']) : [],
+    isKingdomCreated: state.isKingdomCreated === true,
+    isLoading: false,
+    error: null,
+  });
+};
+
+const loadBackendGame = async (): Promise<WebHatcheryGameState> => {
+  const session = useWebHatcherySessionStore.getState();
+  try {
+    return await session.loadGame();
+  } catch {
+    return await session.continueAsGuest();
+  }
+};
+
+const runIntent = async (
+  intent: string,
+  payload: Record<string, unknown> = {},
+): Promise<WebHatcheryGameState> => {
+  if (!useWebHatcherySessionStore.getState().gameState) {
+    applyBackendGame(await loadBackendGame());
+  }
+
+  const game = await webhatcheryGameApi.applyIntent(intent, payload);
+  useWebHatcherySessionStore.setState({ gameState: game, user: game.user });
+  applyBackendGame(game);
+  return game;
+};
+
+const lastBattleResult = (game: WebHatcheryGameState): BackendBattleResult | null => {
+  const result = game.save.state.lastBattleResult;
+  return isRecord(result) ? (result as unknown as BackendBattleResult) : null;
+};
+
+export const useGameStore = create<GameStore>((set, get) => ({
+  ...initialGameState,
+  currentTab: 'kingdom',
+  notifications: [],
+  isKingdomCreated: false,
+  isLoading: false,
+  error: null,
+
+  setCurrentTab: tab => set({ currentTab: tab }),
+
+  createKingdom: async (name, flag = null) => {
+    try {
+      await runIntent('create_kingdom', { name, flag });
+      return true;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to create kingdom.' });
+      return false;
     }
-  )
-);
+  },
 
-// Auto-save is handled by Zustand persist middleware
-// Update game time every second
-setInterval(() => {
-  useGameStore.getState().updateGameTime();
+  addResources: async resources => {
+    try {
+      await runIntent('add_resources', { resources });
+      return true;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to add resources.' });
+      return false;
+    }
+  },
+
+  subtractResources: async resources => {
+    try {
+      await runIntent('subtract_resources', { resources });
+      return true;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Insufficient resources.' });
+      return false;
+    }
+  },
+
+  canAfford: cost => {
+    const { resources } = get();
+    return (Object.keys(cost) as Array<keyof Resources>).every(key => {
+      const value = cost[key];
+      return value === undefined || resources[key] >= value;
+    });
+  },
+
+  getProductionRates: () => {
+    const { buildings, research } = get();
+    const baseRates = { gold: 0, food: 0, wood: 0, stone: 0 };
+    Object.entries(buildings).forEach(([key, building]) => {
+      if (building.production && building.level > 0) {
+        const production = building.production * building.level;
+        if (key === 'goldMine') baseRates.gold += production;
+        else if (key === 'farm') baseRates.food += production;
+        else if (key === 'lumberMill') baseRates.wood += production;
+        else if (key === 'stoneQuarry') baseRates.stone += production;
+      }
+    });
+    if (research.completed.includes('agriculture')) baseRates.food *= 1.5;
+    if (research.completed.includes('mining')) {
+      baseRates.gold *= 1.4;
+      baseRates.stone *= 1.4;
+    }
+    return baseRates;
+  },
+
+  upgradeBuilding: async buildingKey => {
+    try {
+      await runIntent('upgrade_building', { buildingKey });
+      const building = get().buildings[buildingKey];
+      get().addNotification({
+        type: 'success',
+        message: `${building?.name ?? 'Building'} upgraded!`,
+      });
+      return true;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to upgrade building.' });
+      return false;
+    }
+  },
+
+  getBuildingUpgradeCost: buildingKey => {
+    const building = get().buildings[buildingKey];
+    if (!building || building.level >= building.maxLevel) return null;
+    const multiplier = Math.pow(1.5, building.level);
+    return {
+      gold: Math.floor(building.cost.gold * multiplier),
+      food: Math.floor(building.cost.food * multiplier),
+      wood: Math.floor(building.cost.wood * multiplier),
+      stone: Math.floor(building.cost.stone * multiplier),
+    };
+  },
+
+  canUpgradeBuilding: buildingKey => {
+    const building = get().buildings[buildingKey];
+    const upgradeCost = get().getBuildingUpgradeCost(buildingKey);
+    return Boolean(building && upgradeCost && get().canAfford(upgradeCost));
+  },
+
+  trainUnit: async (unitType, quantity) => {
+    try {
+      await runIntent('train_unit', { unitType, quantity });
+      const unit = gameData.units[unitType];
+      get().addNotification({
+        type: 'success',
+        message: `Training ${quantity} ${unit?.name ?? 'unit'}${quantity > 1 ? 's' : ''}...`,
+      });
+      return true;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to train units.' });
+      return false;
+    }
+  },
+
+  processTrainingQueue: async () => {
+    try {
+      await runIntent('process_training_queue');
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to process training queue.' });
+    }
+  },
+
+  getArmyPower: () => {
+    const { army, research } = get();
+    let totalPower = 0;
+    Object.entries(army).forEach(([unitType, count]) => {
+      const unit = gameData.units[unitType];
+      if (unit) {
+        let unitPower = unit.attack + unit.defense + unit.health;
+        if (research.completed.includes('ironWorking')) unitPower *= 1.2;
+        totalPower += unitPower * count;
+      }
+    });
+    return Math.floor(totalPower);
+  },
+
+  startResearch: async techKey => {
+    try {
+      await runIntent('start_research', { techKey });
+      get().addNotification({
+        type: 'success',
+        message: `Research started: ${gameData.technologies[techKey]?.name ?? 'Technology'}`,
+      });
+      return true;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to start research.' });
+      return false;
+    }
+  },
+
+  completeResearch: async () => {
+    try {
+      await runIntent('complete_research');
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to complete research.' });
+    }
+  },
+
+  canResearch: techKey => {
+    const { research } = get();
+    return !research.completed.includes(techKey) && research.inProgress !== techKey && research.inProgress === null;
+  },
+
+  attackKingdom: async enemy => {
+    try {
+      const game = await runIntent('attack_kingdom', { enemy });
+      return lastBattleResult(game);
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to attack kingdom.' });
+      return null;
+    }
+  },
+
+  addNotification: notification => {
+    const newNotification: NotificationData = {
+      ...notification,
+      id: `notification-${Date.now()}-${Math.random()}`,
+      timestamp: Date.now(),
+    };
+    set(state => ({ notifications: [...state.notifications, newNotification] }));
+    window.setTimeout(() => get().removeNotification(newNotification.id), notification.duration || 5000);
+  },
+
+  removeNotification: id => {
+    set(state => ({ notifications: state.notifications.filter(n => n.id !== id) }));
+  },
+
+  updateGameTime: async () => {
+    try {
+      await runIntent('update_game_time');
+    } catch {
+      // The next tick or user action will retry backend synchronization.
+    }
+  },
+
+  saveGame: async () => {
+    try {
+      await runIntent('save');
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Unable to save game.' });
+    }
+  },
+
+  loadGame: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      applyBackendGame(await loadBackendGame());
+    } catch (error) {
+      set({ isLoading: false, error: error instanceof Error ? error.message : 'Unable to load game.' });
+    }
+  },
+}));
+
+window.setInterval(() => {
+  void useGameStore.getState().updateGameTime();
 }, 1000);
